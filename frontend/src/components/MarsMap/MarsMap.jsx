@@ -1,95 +1,73 @@
 import { useEffect } from "react";
-
-import {
-  MapContainer,
-  TileLayer,
-  CircleMarker,
-  useMap,
-} from "react-leaflet";
-
+import { MapContainer, TileLayer, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 
 import { MarsCRS } from "../../utils/marsCRS";
+import { MARS_MAP } from "../../utils/mapConfig";
+import AOILayer from "./AOILayer";
+import StartGoalLayer from "./StartGoalLayer";
+import RouteLayer from "./RouteLayer";
+import ScienceTargetsLayer from "./ScienceTargetsLayer";
+import ScienceRasterLayer from "./ScienceRasterLayer";
+import MapClickHandler from "./MapControls";
 
 const CTX_BOUNDS = [
   [1042131.6352, 4329192.1081],
   [1143347.4242, 4418058.7893],
 ];
 
-const TEST_POINT = [
-  1099980.91,
-  4357354.05,
-];
-
-/**
- * Fit the map to the complete CTX coverage.
- */
 function FitCTX() {
   const map = useMap();
-
   useEffect(() => {
-    map.fitBounds(CTX_BOUNDS, {
-      padding: [0, 0],
-      animate: false,
-    });
+    map.fitBounds(CTX_BOUNDS, { padding: [20, 20], animate: false });
     map.setMinZoom(map.getZoom());
   }, [map]);
-
   return null;
 }
 
-function MarsMap() {
+function MarsMap({ layers, start, goal, route, scienceTargets, onMapClick, onScienceSelect, onRouteSelect, selectedTargetId }) {
   return (
     <MapContainer
       crs={MarsCRS}
-      center={[1095000, 4355000]}
+      center={[MARS_MAP.center.y, MARS_MAP.center.x]}
       zoom={4}
-      zoomSnap={0.25} 
-
-      /*
-       * z=0 is allowed technically,
-       * but we don't want the raster
-       * to become smaller than the viewport.
-       *
-       * z=1 gives us a safer minimum
-       * while we establish the final UI.
-       */
+      zoomSnap={0.25}
       minZoom={1}
       maxZoom={7}
-
       maxBounds={CTX_BOUNDS}
-      maxBoundsViscosity={1.0}
-
-      zoomControl={true}
-
-      style={{
-        width: "100vw",
-        height: "100vh",
-        background: "#000",
-      }}
+      maxBoundsViscosity={1}
+      zoomControl
+      style={{ width: "100%", height: "100%", background: "#111316" }}
     >
       <FitCTX />
+      <MapClickHandler onMapClick={onMapClick} />
 
-      <TileLayer
-        url="/tiles/ctx/{z}/{x}/{y}.png"
-        tileSize={256}
-        minZoom={1}
-        maxNativeZoom={7}   
-        maxZoom={7}
-        attribution="NASA / MarsWalk Intelligence"
-        noWrap={true}
+      {layers.ctx?.enabled && (
+        <TileLayer
+          url="/tiles/ctx/{z}/{x}/{y}.png"
+          tileSize={256}
+          minZoom={1}
+          maxNativeZoom={7}
+          maxZoom={7}
+          updateWhenZooming={false}
+          attribution="NASA / MarsWalk Intelligence"
+          noWrap
+          opacity={layers.ctx?.opacity ?? 1}
+        />
+      )}
+
+      {layers.aoi?.enabled && <AOILayer />}
+      <StartGoalLayer start={start} goal={goal} enabled={layers.startGoal?.enabled} />
+      <RouteLayer route={route} enabled={layers.route?.enabled} onSelect={onRouteSelect} />
+      <ScienceRasterLayer
+  enabled={layers.crism?.enabled}
+  opacity={layers.crism?.opacity ?? 0.45}
       />
-
-      {/* Temporary coordinate alignment test */}
-      <CircleMarker
-        center={TEST_POINT}
-        radius={8}
-        pathOptions={{
-          color: "red",
-          fillColor: "red",
-          fillOpacity: 1,
-          weight: 2,
-        }}
+      <ScienceTargetsLayer
+        targets={scienceTargets}
+        enabled={layers.scienceTargets?.enabled}
+        selectedId={selectedTargetId}
+        onSelect={onScienceSelect}
       />
     </MapContainer>
   );

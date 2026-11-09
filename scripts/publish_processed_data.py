@@ -35,7 +35,12 @@ def main():
     with open(MANIFEST_PATH, "r") as f:
         manifest = yaml.safe_load(f)
 
-    dataset_slug = manifest.get("processed_kaggle_dataset", manifest.get("kaggle_dataset"))
+    try:
+        dataset_slug = manifest["bulk"]["processed"]["kaggle_dataset"]
+    except KeyError:
+        # Never fall back to the raw dataset: publishing processed data
+        # over the raw dataset would overwrite the source files.
+        sys.exit("manifest.yaml has no bulk.processed.kaggle_dataset; refusing to publish.")
 
     print(f"Publishing {PROCESSED_DIR} -> {dataset_slug}")
 

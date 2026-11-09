@@ -1,0 +1,5 @@
+[
+  {"id":"S-001","x":4352600,"y":1092400,"signal":0.74,"signal_name":"D2300","area_m2":310,"source":"frt000047a3_07_brcarj_mtr3.img"},
+  {"id":"S-002","x":4356100,"y":1095700,"signal":0.88,"signal_name":"D2300","area_m2":520,"source":"frt000047a3_07_brcarj_mtr3.img"},
+  {"id":"S-003","x":4358300,"y":1098200,"signal":0.82,"signal_name":"D2300","area_m2":420,"source":"frt000047a3_07_brcarj_mtr3.img"}
+]
