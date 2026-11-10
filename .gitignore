@@ -162,3 +162,9 @@ docker-compose.override.yml
 *.swp
 *.swo
 *~
+
+
+
+resources/*
+!resources/.gitkeep
+
