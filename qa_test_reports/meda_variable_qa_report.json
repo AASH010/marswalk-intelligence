@@ -1,0 +1,1885 @@
+{
+  "report_name": "MEDA Variable-Level QA",
+  "report_version": "2.0.0",
+  "input_file": "D:\\projects\\project MWI\\marswalk-intelligence\\resources\\MEDA_Weather_ds\\processed\\meda_normalized_test.jsonl",
+  "methodology": {
+    "processing_mode": "two_pass_streaming_jsonl",
+    "pass_1": "Discover the union of measurement variable names.",
+    "pass_2": "Analyze every discovered variable across every valid JSON object record, including missing keys.",
+    "variable_discovery": "dynamic",
+    "records_total_definition": "Number of valid JSON object records. Each discovered variable is evaluated against this same denominator.",
+    "statistics_algorithm": "Welford_online",
+    "standard_deviation": "population",
+    "sentinel_policy": "999999999 is treated as a candidate sentinel. It is counted but excluded from descriptive statistics. Source-document validation is still required before treating this as definitive.",
+    "quality_policy": "Quality values are counted without assigning scientific meaning to them.",
+    "threshold_policy": "No physical validity thresholds are applied."
+  },
+  "dataset": {
+    "records_scanned": 471708,
+    "object_records": 471708,
+    "invalid_json_lines": 0,
+    "non_object_records": 0,
+    "missing_sol_records": 0,
+    "missing_measurements_object": 0,
+    "invalid_measurements_object": 0,
+    "sol_count": 10,
+    "sol_record_counts": {
+      "230": 48026,
+      "231": 46396,
+      "232": 47990,
+      "233": 46432,
+      "234": 48007,
+      "235": 46434,
+      "236": 41654,
+      "237": 48459,
+      "238": 47581,
+      "239": 50729
+    },
+    "measurement_variable_count": 41
+  },
+  "variables": {
+    "air_temp_k": {
+      "records_total": 471708,
+      "measurement_key_present": 471471,
+      "measurement_key_present_pct": 99.949757,
+      "measurement_key_missing": 237,
+      "measurement_explicit_null": 0,
+      "measurement_non_object": 0,
+      "measurement_object_present": 471471,
+      "value_key_missing": 0,
+      "value_explicit_null": 0,
+      "numeric_values": 471471,
+      "non_numeric_values": 0,
+      "non_finite_values": 0,
+      "candidate_sentinel_values": 0,
+      "valid_numeric_values": 471471,
+      "measurement_types": {},
+      "value_types": {
+        "float": 466818,
+        "int": 4653
+      },
+      "metadata": {
+        "units": {
+          "\"K\"": 471471
+        },
+        "source_levels": {
+          "\"calibrated\"": 471471
+        },
+        "source_products": {
+          "\"TIRS\"": 471471
+        },
+        "source_channels": {
+          "\"AIR_TEMP\"": 471471
+        }
+      },
+      "statistics": {
+        "count": 471471,
+        "min": 195.72,
+        "max": 248.37,
+        "mean": 219.96541823356827,
+        "population_std": 15.22838752513638,
+        "zero_count": 0,
+        "negative_count": 0,
+        "positive_count": 471471
+      }
+    },
+    "ats_local_temp_1_k": {
+      "records_total": 471708,
+      "measurement_key_present": 471482,
+      "measurement_key_present_pct": 99.952089,
+      "measurement_key_missing": 226,
+      "measurement_explicit_null": 0,
+      "measurement_non_object": 0,
+      "measurement_object_present": 471482,
+      "value_key_missing": 0,
+      "value_explicit_null": 0,
+      "numeric_values": 471482,
+      "non_numeric_values": 0,
+      "non_finite_values": 0,
+      "candidate_sentinel_values": 0,
+      "valid_numeric_values": 471482,
+      "measurement_types": {},
+      "value_types": {
+        "float": 466782,
+        "int": 4700
+      },
+      "metadata": {
+        "units": {
+          "\"K\"": 471482
+        },
+        "source_levels": {
+          "\"calibrated\"": 471482
+        },
+        "source_products": {
+          "\"ATS\"": 471482
+        },
+        "source_channels": {
+          "\"ATS_LOCAL_TEMP1\"": 471482
+        }
+      },
+      "statistics": {
+        "count": 471482,
+        "min": 193.92,
+        "max": 260.62,
+        "mean": 219.96911875745408,
+        "population_std": 17.627068445838766,
+        "zero_count": 0,
+        "negative_count": 0,
+        "positive_count": 471482
+      }
+    },
+    "ats_local_temp_2_k": {
+      "records_total": 471708,
+      "measurement_key_present": 471482,
+      "measurement_key_present_pct": 99.952089,
+      "measurement_key_missing": 226,
+      "measurement_explicit_null": 0,
+      "measurement_non_object": 0,
+      "measurement_object_present": 471482,
+      "value_key_missing": 0,
+      "value_explicit_null": 0,
+      "numeric_values": 471482,
+      "non_numeric_values": 0,
+      "non_finite_values": 0,
+      "candidate_sentinel_values": 0,
+      "valid_numeric_values": 471482,
+      "measurement_types": {},
+      "value_types": {
+        "float": 466660,
+        "int": 4822
+      },
+      "metadata": {
+        "units": {
+          "\"K\"": 471482
+        },
+        "source_levels": {
+          "\"calibrated\"": 471482
+        },
+        "source_products": {
+          "\"ATS\"": 471482
+        },
+        "source_channels": {
+          "\"ATS_LOCAL_TEMP2\"": 471482
+        }
+      },
+      "statistics": {
+        "count": 471482,
+        "min": 195.16,
+        "max": 263.12,
+        "mean": 221.97966469557915,
+        "population_std": 18.14932759099912,
+        "zero_count": 0,
+        "negative_count": 0,
+        "positive_count": 471482
+      }
+    },
+    "ats_local_temp_3_k": {
+      "records_total": 471708,
+      "measurement_key_present": 471482,
+      "measurement_key_present_pct": 99.952089,
+      "measurement_key_missing": 226,
+      "measurement_explicit_null": 0,
+      "measurement_non_object": 0,
+      "measurement_object_present": 471482,
+      "value_key_missing": 0,
+      "value_explicit_null": 0,
+      "numeric_values": 471482,
+      "non_numeric_values": 0,
+      "non_finite_values": 0,
+      "candidate_sentinel_values": 0,
+      "valid_numeric_values": 471482,
+      "measurement_types": {},
+      "value_types": {
+        "float": 466674,
+        "int": 4808
+      },
+      "metadata": {
+        "units": {
+          "\"K\"": 471482
+        },
+        "source_levels": {
+          "\"calibrated\"": 471482
+        },
+        "source_products": {
+          "\"ATS\"": 471482
+        },
+        "source_channels": {
+          "\"ATS_LOCAL_TEMP3\"": 471482
+        }
+      },
+      "statistics": {
+        "count": 471482,
+        "min": 194.93,
+        "max": 266.01,
+        "mean": 223.20389798549843,
+        "population_std": 19.321704379951832,
+        "zero_count": 0,
+        "negative_count": 0,
+        "positive_count": 471482
+      }
+    },
+    "ats_local_temp_4_k": {
+      "records_total": 471708,
+      "measurement_key_present": 471482,
+      "measurement_key_present_pct": 99.952089,
+      "measurement_key_missing": 226,
+      "measurement_explicit_null": 0,
+      "measurement_non_object": 0,
+      "measurement_object_present": 471482,
+      "value_key_missing": 0,
+      "value_explicit_null": 0,
+      "numeric_values": 471482,
+      "non_numeric_values": 0,
+      "non_finite_values": 0,
+      "candidate_sentinel_values": 0,
+      "valid_numeric_values": 471482,
+      "measurement_types": {},
+      "value_types": {
+        "float": 466821,
+        "int": 4661
+      },
+      "metadata": {
+        "units": {
+          "\"K\"": 471482
+        },
+        "source_levels": {
+          "\"calibrated\"": 471482
+        },
+        "source_products": {
+          "\"ATS\"": 471482
+        },
+        "source_channels": {
+          "\"ATS_LOCAL_TEMP4\"": 471482
+        }
+      },
+      "statistics": {
+        "count": 471482,
+        "min": 199.02,
+        "max": 271.57,
+        "mean": 229.238588259997,
+        "population_std": 21.434824252413115,
+        "zero_count": 0,
+        "negative_count": 0,
+        "positive_count": 471482
+      }
+    },
+    "ats_local_temp_5_k": {
+      "records_total": 471708,
+      "measurement_key_present": 471482,
+      "measurement_key_present_pct": 99.952089,
+      "measurement_key_missing": 226,
+      "measurement_explicit_null": 0,
+      "measurement_non_object": 0,
+      "measurement_object_present": 471482,
+      "value_key_missing": 0,
+      "value_explicit_null": 0,
+      "numeric_values": 471482,
+      "non_numeric_values": 0,
+      "non_finite_values": 0,
+      "candidate_sentinel_values": 0,
+      "valid_numeric_values": 471482,
+      "measurement_types": {},
+      "value_types": {
+        "float": 466734,
+        "int": 4748
+      },
+      "metadata": {
+        "units": {
+          "\"K\"": 471482
+        },
+        "source_levels": {
+          "\"calibrated\"": 471482
+        },
+        "source_products": {
+          "\"ATS\"": 471482
+        },
+        "source_channels": {
+          "\"ATS_LOCAL_TEMP5\"": 471482
+        }
+      },
+      "statistics": {
+        "count": 471482,
+        "min": 198.18,
+        "max": 267.78,
+        "mean": 226.316978951479,
+        "population_std": 18.30225988800541,
+        "zero_count": 0,
+        "negative_count": 0,
+        "positive_count": 471482
+      }
+    },
+    "boom1_horizontal_wind_speed_m_s": {
+      "records_total": 471708,
+      "measurement_key_present": 356486,
+      "measurement_key_present_pct": 75.573448,
+      "measurement_key_missing": 115222,
+      "measurement_explicit_null": 0,
+      "measurement_non_object": 0,
+      "measurement_object_present": 356486,
+      "value_key_missing": 0,
+      "value_explicit_null": 0,
+      "numeric_values": 356486,
+      "non_numeric_values": 0,
+      "non_finite_values": 0,
+      "candidate_sentinel_values": 0,
+      "valid_numeric_values": 356486,
+      "measurement_types": {},
+      "value_types": {
+        "float": 347003,
+        "int": 9483
+      },
+      "metadata": {
+        "units": {
+          "\"m/s\"": 356486
+        },
+        "source_levels": {
+          "\"calibrated\"": 356486
+        },
+        "source_products": {
+          "\"WS\"": 356486
+        },
+        "source_channels": {
+          "\"BOOM1_HORIZONTAL_WIND_SPEED\"": 356486
+        }
+      },
+      "statistics": {
+        "count": 356486,
+        "min": 0.0,
+        "max": 49.52,
+        "mean": 2.429759822265119,
+        "population_std": 1.9929739328358165,
+        "zero_count": 6554,
+        "negative_count": 0,
+        "positive_count": 349932
+      }
+    },
+    "boom1_wind_direction_deg": {
+      "records_total": 471708,
+      "measurement_key_present": 356486,
+      "measurement_key_present_pct": 75.573448,
+      "measurement_key_missing": 115222,
+      "measurement_explicit_null": 0,
+      "measurement_non_object": 0,
+      "measurement_object_present": 356486,
+      "value_key_missing": 0,
+      "value_explicit_null": 0,
+      "numeric_values": 356486,
+      "non_numeric_values": 0,
+      "non_finite_values": 0,
+      "candidate_sentinel_values": 0,
+      "valid_numeric_values": 356486,
+      "measurement_types": {},
+      "value_types": {
+        "float": 355389,
+        "int": 1097
+      },
+      "metadata": {
+        "units": {
+          "\"deg\"": 356486
+        },
+        "source_levels": {
+          "\"calibrated\"": 356486
+        },
+        "source_products": {
+          "\"WS\"": 356486
+        },
+        "source_channels": {
+          "\"BOOM1_WIND_DIRECTION\"": 356486
+        }
+      },
+      "statistics": {
+        "count": 356486,
+        "min": 2.04,
+        "max": 358.78,
+        "mean": 171.45531925516866,
+        "population_std": 102.79278921848379,
+        "zero_count": 0,
+        "negative_count": 0,
+        "positive_count": 356486
+      }
+    },
+    "boom2_horizontal_wind_speed_m_s": {
+      "records_total": 471708,
+      "measurement_key_present": 356727,
+      "measurement_key_present_pct": 75.624539,
+      "measurement_key_missing": 114981,
+      "measurement_explicit_null": 0,
+      "measurement_non_object": 0,
+      "measurement_object_present": 356727,
+      "value_key_missing": 0,
+      "value_explicit_null": 0,
+      "numeric_values": 356727,
+      "non_numeric_values": 0,
+      "non_finite_values": 0,
+      "candidate_sentinel_values": 0,
+      "valid_numeric_values": 356727,
+      "measurement_types": {},
+      "value_types": {
+        "float": 353547,
+        "int": 3180
+      },
+      "metadata": {
+        "units": {
+          "\"m/s\"": 356727
+        },
+        "source_levels": {
+          "\"calibrated\"": 356727
+        },
+        "source_products": {
+          "\"WS\"": 356727
+        },
+        "source_channels": {
+          "\"BOOM2_HORIZONTAL_WIND_SPEED\"": 356727
+        }
+      },
+      "statistics": {
+        "count": 356727,
+        "min": 0.0,
+        "max": 37.69,
+        "mean": 3.0788207228496547,
+        "population_std": 2.348227185384151,
+        "zero_count": 21,
+        "negative_count": 0,
+        "positive_count": 356706
+      }
+    },
+    "boom2_wind_direction_deg": {
+      "records_total": 471708,
+      "measurement_key_present": 356727,
+      "measurement_key_present_pct": 75.624539,
+      "measurement_key_missing": 114981,
+      "measurement_explicit_null": 0,
+      "measurement_non_object": 0,
+      "measurement_object_present": 356727,
+      "value_key_missing": 0,
+      "value_explicit_null": 0,
+      "numeric_values": 356727,
+      "non_numeric_values": 0,
+      "non_finite_values": 0,
+      "candidate_sentinel_values": 0,
+      "valid_numeric_values": 356727,
+      "measurement_types": {},
+      "value_types": {
+        "float": 356421,
+        "int": 306
+      },
+      "metadata": {
+        "units": {
+          "\"deg\"": 356727
+        },
+        "source_levels": {
+          "\"calibrated\"": 356727
+        },
+        "source_products": {
+          "\"WS\"": 356727
+        },
+        "source_channels": {
+          "\"BOOM2_WIND_DIRECTION\"": 356727
+        }
+      },
+      "statistics": {
+        "count": 356727,
+        "min": 1.98,
+        "max": 359.27,
+        "mean": 168.68614301692512,
+        "population_std": 87.60249504674525,
+        "zero_count": 0,
+        "negative_count": 0,
+        "positive_count": 356727
+      }
+    },
+    "downward_lw_irradiance_cal_w_m2": {
+      "records_total": 471708,
+      "measurement_key_present": 471471,
+      "measurement_key_present_pct": 99.949757,
+      "measurement_key_missing": 237,
+      "measurement_explicit_null": 0,
+      "measurement_non_object": 0,
+      "measurement_object_present": 471471,
+      "value_key_missing": 0,
+      "value_explicit_null": 0,
+      "numeric_values": 471471,
+      "non_numeric_values": 0,
+      "non_finite_values": 0,
+      "candidate_sentinel_values": 0,
+      "valid_numeric_values": 471471,
+      "measurement_types": {},
+      "value_types": {
+        "float": 466252,
+        "int": 5219
+      },
+      "metadata": {
+        "units": {
+          "\"W/m2\"": 471471
+        },
+        "source_levels": {
+          "\"calibrated\"": 471471
+        },
+        "source_products": {
+          "\"TIRS\"": 471471
+        },
+        "source_channels": {
+          "\"DOWNWARD_LW_IRRADIANCE\"": 471471
+        }
+      },
+      "statistics": {
+        "count": 471471,
+        "min": 10.16,
+        "max": 20.59,
+        "mean": 14.665882758430362,
+        "population_std": 2.754787883090402,
+        "zero_count": 0,
+        "negative_count": 0,
+        "positive_count": 471471
+      }
+    },
+    "downward_lw_irradiance_derived_w_m2": {
+      "records_total": 471708,
+      "measurement_key_present": 471471,
+      "measurement_key_present_pct": 99.949757,
+      "measurement_key_missing": 237,
+      "measurement_explicit_null": 0,
+      "measurement_non_object": 0,
+      "measurement_object_present": 471471,
+      "value_key_missing": 0,
+      "value_explicit_null": 0,
+      "numeric_values": 471471,
+      "non_numeric_values": 0,
+      "non_finite_values": 0,
+      "candidate_sentinel_values": 0,
+      "valid_numeric_values": 471471,
+      "measurement_types": {},
+      "value_types": {
+        "float": 466742,
+        "int": 4729
+      },
+      "metadata": {
+        "units": {
+          "\"W/m2\"": 471471
+        },
+        "source_levels": {
+          "\"derived\"": 471471
+        },
+        "source_products": {
+          "\"TIRS\"": 471471
+        },
+        "source_channels": {
+          "\"DOWNWARD_LW_IRRADIANCE\"": 471471
+        }
+      },
+      "statistics": {
+        "count": 471471,
+        "min": 22.17,
+        "max": 40.68,
+        "mean": 30.190955668535437,
+        "population_std": 4.622978366896772,
+        "zero_count": 0,
+        "negative_count": 0,
+        "positive_count": 471471
+      }
+    },
+    "ground_brightness_temp_k": {
+      "records_total": 471708,
+      "measurement_key_present": 471471,
+      "measurement_key_present_pct": 99.949757,
+      "measurement_key_missing": 237,
+      "measurement_explicit_null": 0,
+      "measurement_non_object": 0,
+      "measurement_object_present": 471471,
+      "value_key_missing": 0,
+      "value_explicit_null": 0,
+      "numeric_values": 471471,
+      "non_numeric_values": 0,
+      "non_finite_values": 0,
+      "candidate_sentinel_values": 0,
+      "valid_numeric_values": 471471,
+      "measurement_types": {},
+      "value_types": {
+        "float": 466698,
+        "int": 4773
+      },
+      "metadata": {
+        "units": {
+          "\"K\"": 471471
+        },
+        "source_levels": {
+          "\"calibrated\"": 471471
+        },
+        "source_products": {
+          "\"TIRS\"": 471471
+        },
+        "source_channels": {
+          "\"GROUND_TEMP\"": 471471
+        }
+      },
+      "statistics": {
+        "count": 471471,
+        "min": 198.79,
+        "max": 280.93,
+        "mean": 229.13368538043923,
+        "population_std": 23.761207550468633,
+        "zero_count": 0,
+        "negative_count": 0,
+        "positive_count": 471471
+      }
+    },
+    "horizontal_wind_speed_m_s": {
+      "records_total": 471708,
+      "measurement_key_present": 361534,
+      "measurement_key_present_pct": 76.643602,
+      "measurement_key_missing": 110174,
+      "measurement_explicit_null": 0,
+      "measurement_non_object": 0,
+      "measurement_object_present": 361534,
+      "value_key_missing": 0,
+      "value_explicit_null": 0,
+      "numeric_values": 361534,
+      "non_numeric_values": 0,
+      "non_finite_values": 0,
+      "candidate_sentinel_values": 9676,
+      "valid_numeric_values": 351858,
+      "measurement_types": {},
+      "value_types": {
+        "float": 348197,
+        "int": 13337
+      },
+      "metadata": {
+        "units": {
+          "\"m/s\"": 361534
+        },
+        "source_levels": {
+          "\"derived\"": 361534
+        },
+        "source_products": {
+          "\"WS\"": 361534
+        },
+        "source_channels": {
+          "\"HORIZONTAL_WIND_SPEED\"": 361534
+        }
+      },
+      "statistics": {
+        "count": 351858,
+        "min": 0.0,
+        "max": 19.14,
+        "mean": 3.1808786499099124,
+        "population_std": 2.2912258390375664,
+        "zero_count": 314,
+        "negative_count": 0,
+        "positive_count": 351544
+      }
+    },
+    "humidity_sensor_temp_cal_k": {
+      "records_total": 471708,
+      "measurement_key_present": 430089,
+      "measurement_key_present_pct": 91.176957,
+      "measurement_key_missing": 41619,
+      "measurement_explicit_null": 0,
+      "measurement_non_object": 0,
+      "measurement_object_present": 430089,
+      "value_key_missing": 0,
+      "value_explicit_null": 0,
+      "numeric_values": 430089,
+      "non_numeric_values": 0,
+      "non_finite_values": 0,
+      "candidate_sentinel_values": 0,
+      "valid_numeric_values": 430089,
+      "measurement_types": {},
+      "value_types": {
+        "float": 425948,
+        "int": 4141
+      },
+      "metadata": {
+        "units": {
+          "\"K\"": 430089
+        },
+        "source_levels": {
+          "\"calibrated\"": 430089
+        },
+        "source_products": {
+          "\"RHS\"": 430089
+        },
+        "source_channels": {
+          "\"HUMICAP_TEMP\"": 430089
+        }
+      },
+      "statistics": {
+        "count": 430089,
+        "min": 199.16,
+        "max": 267.3,
+        "mean": 229.57651641868952,
+        "population_std": 19.838777048097615,
+        "zero_count": 0,
+        "negative_count": 0,
+        "positive_count": 430089
+      }
+    },
+    "humidity_sensor_temp_k": {
+      "records_total": 471708,
+      "measurement_key_present": 382316,
+      "measurement_key_present_pct": 81.049293,
+      "measurement_key_missing": 89392,
+      "measurement_explicit_null": 0,
+      "measurement_non_object": 0,
+      "measurement_object_present": 382316,
+      "value_key_missing": 0,
+      "value_explicit_null": 0,
+      "numeric_values": 382316,
+      "non_numeric_values": 0,
+      "non_finite_values": 0,
+      "candidate_sentinel_values": 0,
+      "valid_numeric_values": 382316,
+      "measurement_types": {},
+      "value_types": {
+        "float": 378573,
+        "int": 3743
+      },
+      "metadata": {
+        "units": {
+          "\"K\"": 382316
+        },
+        "source_levels": {
+          "\"derived\"": 382316
+        },
+        "source_products": {
+          "\"RHS\"": 382316
+        },
+        "source_channels": {
+          "\"HUMIDITY_LOCAL_TEMP\"": 382316
+        }
+      },
+      "statistics": {
+        "count": 382316,
+        "min": 199.16,
+        "max": 267.3,
+        "mean": 229.97146096423103,
+        "population_std": 19.814956546644364,
+        "zero_count": 0,
+        "negative_count": 0,
+        "positive_count": 382316
+      }
+    },
+    "humidity_thermocap1_temp_k": {
+      "records_total": 471708,
+      "measurement_key_present": 430089,
+      "measurement_key_present_pct": 91.176957,
+      "measurement_key_missing": 41619,
+      "measurement_explicit_null": 0,
+      "measurement_non_object": 0,
+      "measurement_object_present": 430089,
+      "value_key_missing": 0,
+      "value_explicit_null": 0,
+      "numeric_values": 430089,
+      "non_numeric_values": 0,
+      "non_finite_values": 0,
+      "candidate_sentinel_values": 0,
+      "valid_numeric_values": 430089,
+      "measurement_types": {},
+      "value_types": {
+        "float": 425755,
+        "int": 4334
+      },
+      "metadata": {
+        "units": {
+          "\"K\"": 430089
+        },
+        "source_levels": {
+          "\"calibrated\"": 430089
+        },
+        "source_products": {
+          "\"RHS\"": 430089
+        },
+        "source_channels": {
+          "\"THERMOCAP1_TEMP\"": 430089
+        }
+      },
+      "statistics": {
+        "count": 430089,
+        "min": 199.35,
+        "max": 267.6,
+        "mean": 229.63992717786525,
+        "population_std": 19.830224990201298,
+        "zero_count": 0,
+        "negative_count": 0,
+        "positive_count": 430089
+      }
+    },
+    "humidity_thermocap2_temp_k": {
+      "records_total": 471708,
+      "measurement_key_present": 430089,
+      "measurement_key_present_pct": 91.176957,
+      "measurement_key_missing": 41619,
+      "measurement_explicit_null": 0,
+      "measurement_non_object": 0,
+      "measurement_object_present": 430089,
+      "value_key_missing": 0,
+      "value_explicit_null": 0,
+      "numeric_values": 430089,
+      "non_numeric_values": 0,
+      "non_finite_values": 0,
+      "candidate_sentinel_values": 0,
+      "valid_numeric_values": 430089,
+      "measurement_types": {},
+      "value_types": {
+        "float": 425493,
+        "int": 4596
+      },
+      "metadata": {
+        "units": {
+          "\"K\"": 430089
+        },
+        "source_levels": {
+          "\"calibrated\"": 430089
+        },
+        "source_products": {
+          "\"RHS\"": 430089
+        },
+        "source_channels": {
+          "\"THERMOCAP2_TEMP\"": 430089
+        }
+      },
+      "statistics": {
+        "count": 430089,
+        "min": 199.32,
+        "max": 267.49,
+        "mean": 229.58959773442277,
+        "population_std": 19.809322279834866,
+        "zero_count": 0,
+        "negative_count": 0,
+        "positive_count": 430089
+      }
+    },
+    "pressure_barocap1_pa": {
+      "records_total": 471708,
+      "measurement_key_present": 468980,
+      "measurement_key_present_pct": 99.421676,
+      "measurement_key_missing": 2728,
+      "measurement_explicit_null": 0,
+      "measurement_non_object": 0,
+      "measurement_object_present": 468980,
+      "value_key_missing": 0,
+      "value_explicit_null": 0,
+      "numeric_values": 468980,
+      "non_numeric_values": 0,
+      "non_finite_values": 0,
+      "candidate_sentinel_values": 0,
+      "valid_numeric_values": 468980,
+      "measurement_types": {},
+      "value_types": {
+        "float": 464386,
+        "int": 4594
+      },
+      "metadata": {
+        "units": {
+          "\"Pa\"": 468980
+        },
+        "source_levels": {
+          "\"calibrated\"": 468980
+        },
+        "source_products": {
+          "\"PS\"": 468980
+        },
+        "source_channels": {
+          "\"BAROCAP1_PRESSURE\"": 468980
+        }
+      },
+      "statistics": {
+        "count": 468980,
+        "min": 659.93,
+        "max": 686.5,
+        "mean": 670.8896831634661,
+        "population_std": 6.243746230030002,
+        "zero_count": 0,
+        "negative_count": 0,
+        "positive_count": 468980
+      }
+    },
+    "pressure_barocap2_pa": {
+      "records_total": 471708,
+      "measurement_key_present": 468980,
+      "measurement_key_present_pct": 99.421676,
+      "measurement_key_missing": 2728,
+      "measurement_explicit_null": 0,
+      "measurement_non_object": 0,
+      "measurement_object_present": 468980,
+      "value_key_missing": 0,
+      "value_explicit_null": 0,
+      "numeric_values": 468980,
+      "non_numeric_values": 0,
+      "non_finite_values": 0,
+      "candidate_sentinel_values": 0,
+      "valid_numeric_values": 468980,
+      "measurement_types": {},
+      "value_types": {
+        "float": 464526,
+        "int": 4454
+      },
+      "metadata": {
+        "units": {
+          "\"Pa\"": 468980
+        },
+        "source_levels": {
+          "\"calibrated\"": 468980
+        },
+        "source_products": {
+          "\"PS\"": 468980
+        },
+        "source_channels": {
+          "\"BAROCAP2_PRESSURE\"": 468980
+        }
+      },
+      "statistics": {
+        "count": 468980,
+        "min": 650.4,
+        "max": 677.77,
+        "mean": 661.5360680199461,
+        "population_std": 6.392595823549544,
+        "zero_count": 0,
+        "negative_count": 0,
+        "positive_count": 468980
+      }
+    },
+    "pressure_barocap3_pa": {
+      "records_total": 471708,
+      "measurement_key_present": 468980,
+      "measurement_key_present_pct": 99.421676,
+      "measurement_key_missing": 2728,
+      "measurement_explicit_null": 0,
+      "measurement_non_object": 0,
+      "measurement_object_present": 468980,
+      "value_key_missing": 0,
+      "value_explicit_null": 0,
+      "numeric_values": 468980,
+      "non_numeric_values": 0,
+      "non_finite_values": 0,
+      "candidate_sentinel_values": 0,
+      "valid_numeric_values": 468980,
+      "measurement_types": {},
+      "value_types": {
+        "float": 464367,
+        "int": 4613
+      },
+      "metadata": {
+        "units": {
+          "\"Pa\"": 468980
+        },
+        "source_levels": {
+          "\"calibrated\"": 468980
+        },
+        "source_products": {
+          "\"PS\"": 468980
+        },
+        "source_channels": {
+          "\"BAROCAP3_PRESSURE\"": 468980
+        }
+      },
+      "statistics": {
+        "count": 468980,
+        "min": 650.41,
+        "max": 677.47,
+        "mean": 661.4626510938646,
+        "population_std": 6.374526174629682,
+        "zero_count": 0,
+        "negative_count": 0,
+        "positive_count": 468980
+      }
+    },
+    "pressure_pa": {
+      "records_total": 471708,
+      "measurement_key_present": 468980,
+      "measurement_key_present_pct": 99.421676,
+      "measurement_key_missing": 2728,
+      "measurement_explicit_null": 0,
+      "measurement_non_object": 0,
+      "measurement_object_present": 468980,
+      "value_key_missing": 0,
+      "value_explicit_null": 0,
+      "numeric_values": 468980,
+      "non_numeric_values": 0,
+      "non_finite_values": 0,
+      "candidate_sentinel_values": 0,
+      "valid_numeric_values": 468980,
+      "measurement_types": {},
+      "value_types": {
+        "float": 464367,
+        "int": 4613
+      },
+      "metadata": {
+        "units": {
+          "\"Pa\"": 468980
+        },
+        "source_levels": {
+          "\"derived\"": 468980
+        },
+        "source_products": {
+          "\"PS\"": 468980
+        },
+        "source_channels": {
+          "\"PRESSURE\"": 468980
+        }
+      },
+      "statistics": {
+        "count": 468980,
+        "min": 650.41,
+        "max": 677.47,
+        "mean": 661.4626510938646,
+        "population_std": 6.374526174629682,
+        "zero_count": 0,
+        "negative_count": 0,
+        "positive_count": 468980
+      }
+    },
+    "pressure_thermocap1_k": {
+      "records_total": 471708,
+      "measurement_key_present": 468980,
+      "measurement_key_present_pct": 99.421676,
+      "measurement_key_missing": 2728,
+      "measurement_explicit_null": 0,
+      "measurement_non_object": 0,
+      "measurement_object_present": 468980,
+      "value_key_missing": 0,
+      "value_explicit_null": 0,
+      "numeric_values": 468980,
+      "non_numeric_values": 0,
+      "non_finite_values": 0,
+      "candidate_sentinel_values": 0,
+      "valid_numeric_values": 468980,
+      "measurement_types": {},
+      "value_types": {
+        "float": 464009,
+        "int": 4971
+      },
+      "metadata": {
+        "units": {
+          "\"K\"": 468980
+        },
+        "source_levels": {
+          "\"calibrated\"": 468980
+        },
+        "source_products": {
+          "\"PS\"": 468980
+        },
+        "source_channels": {
+          "\"THERMOCAP1_TEMP\"": 468980
+        }
+      },
+      "statistics": {
+        "count": 468980,
+        "min": 280.83,
+        "max": 304.0,
+        "mean": 289.8778869674609,
+        "population_std": 6.881477341285584,
+        "zero_count": 0,
+        "negative_count": 0,
+        "positive_count": 468980
+      }
+    },
+    "pressure_thermocap2_k": {
+      "records_total": 471708,
+      "measurement_key_present": 468980,
+      "measurement_key_present_pct": 99.421676,
+      "measurement_key_missing": 2728,
+      "measurement_explicit_null": 0,
+      "measurement_non_object": 0,
+      "measurement_object_present": 468980,
+      "value_key_missing": 0,
+      "value_explicit_null": 0,
+      "numeric_values": 468980,
+      "non_numeric_values": 0,
+      "non_finite_values": 0,
+      "candidate_sentinel_values": 0,
+      "valid_numeric_values": 468980,
+      "measurement_types": {},
+      "value_types": {
+        "float": 464679,
+        "int": 4301
+      },
+      "metadata": {
+        "units": {
+          "\"K\"": 468980
+        },
+        "source_levels": {
+          "\"calibrated\"": 468980
+        },
+        "source_products": {
+          "\"PS\"": 468980
+        },
+        "source_channels": {
+          "\"THERMOCAP2_TEMP\"": 468980
+        }
+      },
+      "statistics": {
+        "count": 468980,
+        "min": 280.88,
+        "max": 304.07,
+        "mean": 289.94402294340165,
+        "population_std": 6.88679390794382,
+        "zero_count": 0,
+        "negative_count": 0,
+        "positive_count": 468980
+      }
+    },
+    "relative_humidity_humicap_a_pct": {
+      "records_total": 471708,
+      "measurement_key_present": 430016,
+      "measurement_key_present_pct": 91.161481,
+      "measurement_key_missing": 41692,
+      "measurement_explicit_null": 0,
+      "measurement_non_object": 0,
+      "measurement_object_present": 430016,
+      "value_key_missing": 0,
+      "value_explicit_null": 0,
+      "numeric_values": 430016,
+      "non_numeric_values": 0,
+      "non_finite_values": 0,
+      "candidate_sentinel_values": 0,
+      "valid_numeric_values": 430016,
+      "measurement_types": {},
+      "value_types": {
+        "float": 425851,
+        "int": 4165
+      },
+      "metadata": {
+        "units": {
+          "\"%RH\"": 430016
+        },
+        "source_levels": {
+          "\"calibrated\"": 430016
+        },
+        "source_products": {
+          "\"RHS\"": 430016
+        },
+        "source_channels": {
+          "\"HUMICAP_A_HUMIDITY\"": 430016
+        }
+      },
+      "statistics": {
+        "count": 430016,
+        "min": -0.05,
+        "max": 13.89,
+        "mean": 1.5135291244977012,
+        "population_std": 2.2044643055786444,
+        "zero_count": 2312,
+        "negative_count": 11299,
+        "positive_count": 416405
+      }
+    },
+    "relative_humidity_humicap_b_pct": {
+      "records_total": 471708,
+      "measurement_key_present": 430016,
+      "measurement_key_present_pct": 91.161481,
+      "measurement_key_missing": 41692,
+      "measurement_explicit_null": 0,
+      "measurement_non_object": 0,
+      "measurement_object_present": 430016,
+      "value_key_missing": 0,
+      "value_explicit_null": 0,
+      "numeric_values": 430016,
+      "non_numeric_values": 0,
+      "non_finite_values": 0,
+      "candidate_sentinel_values": 0,
+      "valid_numeric_values": 430016,
+      "measurement_types": {},
+      "value_types": {
+        "float": 404262,
+        "int": 25754
+      },
+      "metadata": {
+        "units": {
+          "\"%RH\"": 430016
+        },
+        "source_levels": {
+          "\"calibrated\"": 430016
+        },
+        "source_products": {
+          "\"RHS\"": 430016
+        },
+        "source_channels": {
+          "\"HUMICAP_B_HUMIDITY\"": 430016
+        }
+      },
+      "statistics": {
+        "count": 430016,
+        "min": -0.05,
+        "max": 13.57,
+        "mean": 1.5538683444337207,
+        "population_std": 2.360373142909496,
+        "zero_count": 24103,
+        "negative_count": 92098,
+        "positive_count": 313815
+      }
+    },
+    "relative_humidity_pct": {
+      "records_total": 471708,
+      "measurement_key_present": 382249,
+      "measurement_key_present_pct": 81.03509,
+      "measurement_key_missing": 89459,
+      "measurement_explicit_null": 0,
+      "measurement_non_object": 0,
+      "measurement_object_present": 382249,
+      "value_key_missing": 0,
+      "value_explicit_null": 0,
+      "numeric_values": 382249,
+      "non_numeric_values": 0,
+      "non_finite_values": 0,
+      "candidate_sentinel_values": 0,
+      "valid_numeric_values": 382249,
+      "measurement_types": {},
+      "value_types": {
+        "float": 343779,
+        "int": 38470
+      },
+      "metadata": {
+        "units": {
+          "\"%RH\"": 382249
+        },
+        "source_levels": {
+          "\"derived\"": 382249
+        },
+        "source_products": {
+          "\"RHS\"": 382249
+        },
+        "source_channels": {
+          "\"LOCAL_RELATIVE_HUMIDITY\"": 382249
+        }
+      },
+      "statistics": {
+        "count": 382249,
+        "min": 0.0,
+        "max": 13.66,
+        "mean": 1.494636637375138,
+        "population_std": 2.266583234707462,
+        "zero_count": 36734,
+        "negative_count": 0,
+        "positive_count": 345515
+      }
+    },
+    "rover_pitch_deg": {
+      "records_total": 471708,
+      "measurement_key_present": 471708,
+      "measurement_key_present_pct": 100.0,
+      "measurement_key_missing": 0,
+      "measurement_explicit_null": 0,
+      "measurement_non_object": 0,
+      "measurement_object_present": 471708,
+      "value_key_missing": 0,
+      "value_explicit_null": 0,
+      "numeric_values": 471708,
+      "non_numeric_values": 0,
+      "non_finite_values": 0,
+      "candidate_sentinel_values": 0,
+      "valid_numeric_values": 471708,
+      "measurement_types": {},
+      "value_types": {
+        "float": 471698,
+        "int": 10
+      },
+      "metadata": {
+        "units": {
+          "\"deg\"": 471708
+        },
+        "source_levels": {
+          "\"derived\"": 471708
+        },
+        "source_products": {
+          "\"ANC\"": 471708
+        },
+        "source_channels": {
+          "\"ROVER_PITCH\"": 471708
+        }
+      },
+      "statistics": {
+        "count": 471708,
+        "min": -8.13,
+        "max": 11.96,
+        "mean": 4.555121007063711,
+        "population_std": 3.5651095958831545,
+        "zero_count": 0,
+        "negative_count": 20732,
+        "positive_count": 450976
+      }
+    },
+    "rover_position_x_m": {
+      "records_total": 471708,
+      "measurement_key_present": 471708,
+      "measurement_key_present_pct": 100.0,
+      "measurement_key_missing": 0,
+      "measurement_explicit_null": 0,
+      "measurement_non_object": 0,
+      "measurement_object_present": 471708,
+      "value_key_missing": 0,
+      "value_explicit_null": 0,
+      "numeric_values": 471708,
+      "non_numeric_values": 0,
+      "non_finite_values": 0,
+      "candidate_sentinel_values": 0,
+      "valid_numeric_values": 471708,
+      "measurement_types": {},
+      "value_types": {
+        "float": 471705,
+        "int": 3
+      },
+      "metadata": {
+        "units": {
+          "\"m\"": 471708
+        },
+        "source_levels": {
+          "\"derived\"": 471708
+        },
+        "source_products": {
+          "\"ANC\"": 471708
+        },
+        "source_channels": {
+          "\"ROVER_POSITION_X\"": 471708
+        }
+      },
+      "statistics": {
+        "count": 471708,
+        "min": -641.83,
+        "max": -631.45,
+        "mean": -640.1038762751604,
+        "population_std": 3.156366491617745,
+        "zero_count": 0,
+        "negative_count": 471708,
+        "positive_count": 0
+      }
+    },
+    "rover_position_y_m": {
+      "records_total": 471708,
+      "measurement_key_present": 471708,
+      "measurement_key_present_pct": 100.0,
+      "measurement_key_missing": 0,
+      "measurement_explicit_null": 0,
+      "measurement_non_object": 0,
+      "measurement_object_present": 471708,
+      "value_key_missing": 0,
+      "value_explicit_null": 0,
+      "numeric_values": 471708,
+      "non_numeric_values": 0,
+      "non_finite_values": 0,
+      "candidate_sentinel_values": 0,
+      "valid_numeric_values": 471708,
+      "measurement_types": {},
+      "value_types": {
+        "float": 471705,
+        "int": 3
+      },
+      "metadata": {
+        "units": {
+          "\"m\"": 471708
+        },
+        "source_levels": {
+          "\"derived\"": 471708
+        },
+        "source_products": {
+          "\"ANC\"": 471708
+        },
+        "source_channels": {
+          "\"ROVER_POSITION_Y\"": 471708
+        }
+      },
+      "statistics": {
+        "count": 471708,
+        "min": 442.13,
+        "max": 492.25,
+        "mean": 482.00176038989946,
+        "population_std": 18.248801459635782,
+        "zero_count": 0,
+        "negative_count": 0,
+        "positive_count": 471708
+      }
+    },
+    "rover_position_z_m": {
+      "records_total": 471708,
+      "measurement_key_present": 471708,
+      "measurement_key_present_pct": 100.0,
+      "measurement_key_missing": 0,
+      "measurement_explicit_null": 0,
+      "measurement_non_object": 0,
+      "measurement_object_present": 471708,
+      "value_key_missing": 0,
+      "value_explicit_null": 0,
+      "numeric_values": 471708,
+      "non_numeric_values": 0,
+      "non_finite_values": 0,
+      "candidate_sentinel_values": 0,
+      "valid_numeric_values": 471708,
+      "measurement_types": {},
+      "value_types": {
+        "float": 471707,
+        "int": 1
+      },
+      "metadata": {
+        "units": {
+          "\"m\"": 471708
+        },
+        "source_levels": {
+          "\"derived\"": 471708
+        },
+        "source_products": {
+          "\"ANC\"": 471708
+        },
+        "source_channels": {
+          "\"ROVER_POSITION_Z\"": 471708
+        }
+      },
+      "statistics": {
+        "count": 471708,
+        "min": -3.26,
+        "max": 1.1,
+        "mean": -2.3850273050276556,
+        "population_std": 1.5925048136385949,
+        "zero_count": 0,
+        "negative_count": 401135,
+        "positive_count": 70573
+      }
+    },
+    "rover_roll_deg": {
+      "records_total": 471708,
+      "measurement_key_present": 471708,
+      "measurement_key_present_pct": 100.0,
+      "measurement_key_missing": 0,
+      "measurement_explicit_null": 0,
+      "measurement_non_object": 0,
+      "measurement_object_present": 471708,
+      "value_key_missing": 0,
+      "value_explicit_null": 0,
+      "numeric_values": 471708,
+      "non_numeric_values": 0,
+      "non_finite_values": 0,
+      "candidate_sentinel_values": 0,
+      "valid_numeric_values": 471708,
+      "measurement_types": {},
+      "value_types": {
+        "float": 471700,
+        "int": 8
+      },
+      "metadata": {
+        "units": {
+          "\"deg\"": 471708
+        },
+        "source_levels": {
+          "\"derived\"": 471708
+        },
+        "source_products": {
+          "\"ANC\"": 471708
+        },
+        "source_channels": {
+          "\"ROVER_ROLL\"": 471708
+        }
+      },
+      "statistics": {
+        "count": 471708,
+        "min": -7.06,
+        "max": 0.39,
+        "mean": -4.609259690316798,
+        "population_std": 1.3436583754988902,
+        "zero_count": 0,
+        "negative_count": 451061,
+        "positive_count": 20647
+      }
+    },
+    "rover_velocity_m_s": {
+      "records_total": 471708,
+      "measurement_key_present": 471708,
+      "measurement_key_present_pct": 100.0,
+      "measurement_key_missing": 0,
+      "measurement_explicit_null": 0,
+      "measurement_non_object": 0,
+      "measurement_object_present": 471708,
+      "value_key_missing": 0,
+      "value_explicit_null": 0,
+      "numeric_values": 471708,
+      "non_numeric_values": 0,
+      "non_finite_values": 0,
+      "candidate_sentinel_values": 0,
+      "valid_numeric_values": 471708,
+      "measurement_types": {},
+      "value_types": {
+        "int": 471140,
+        "float": 568
+      },
+      "metadata": {
+        "units": {
+          "\"m/s\"": 471708
+        },
+        "source_levels": {
+          "\"derived\"": 471708
+        },
+        "source_products": {
+          "\"ANC\"": 471708
+        },
+        "source_channels": {
+          "\"ROVER_VELOCITY\"": 471708
+        }
+      },
+      "statistics": {
+        "count": 471708,
+        "min": 0.0,
+        "max": 128.06,
+        "mean": 0.08947766414815984,
+        "population_std": 3.223434626661145,
+        "zero_count": 471140,
+        "negative_count": 0,
+        "positive_count": 568
+      }
+    },
+    "rover_yaw_deg": {
+      "records_total": 471708,
+      "measurement_key_present": 471708,
+      "measurement_key_present_pct": 100.0,
+      "measurement_key_missing": 0,
+      "measurement_explicit_null": 0,
+      "measurement_non_object": 0,
+      "measurement_object_present": 471708,
+      "value_key_missing": 0,
+      "value_explicit_null": 0,
+      "numeric_values": 471708,
+      "non_numeric_values": 0,
+      "non_finite_values": 0,
+      "candidate_sentinel_values": 0,
+      "valid_numeric_values": 471708,
+      "measurement_types": {},
+      "value_types": {
+        "float": 471703,
+        "int": 5
+      },
+      "metadata": {
+        "units": {
+          "\"deg\"": 471708
+        },
+        "source_levels": {
+          "\"derived\"": 471708
+        },
+        "source_products": {
+          "\"ANC\"": 471708
+        },
+        "source_channels": {
+          "\"ROVER_YAW\"": 471708
+        }
+      },
+      "statistics": {
+        "count": 471708,
+        "min": -74.67,
+        "max": 111.17,
+        "mean": 36.792936202056836,
+        "population_std": 36.38592329077263,
+        "zero_count": 0,
+        "negative_count": 20710,
+        "positive_count": 450998
+      }
+    },
+    "solar_longitude_deg": {
+      "records_total": 471708,
+      "measurement_key_present": 471708,
+      "measurement_key_present_pct": 100.0,
+      "measurement_key_missing": 0,
+      "measurement_explicit_null": 0,
+      "measurement_non_object": 0,
+      "measurement_object_present": 471708,
+      "value_key_missing": 0,
+      "value_explicit_null": 0,
+      "numeric_values": 471708,
+      "non_numeric_values": 0,
+      "non_finite_values": 0,
+      "candidate_sentinel_values": 0,
+      "valid_numeric_values": 471708,
+      "measurement_types": {},
+      "value_types": {
+        "float": 467025,
+        "int": 4683
+      },
+      "metadata": {
+        "units": {
+          "\"deg\"": 471708
+        },
+        "source_levels": {
+          "\"derived\"": 471708
+        },
+        "source_products": {
+          "\"ANC\"": 471708
+        },
+        "source_channels": {
+          "\"SOLAR_LONGITUDE_ANGLE\"": 471708
+        }
+      },
+      "statistics": {
+        "count": 471708,
+        "min": -77.27,
+        "max": 77.3,
+        "mean": 1.2017688485249558,
+        "population_std": 60.15602977636057,
+        "zero_count": 11,
+        "negative_count": 233452,
+        "positive_count": 238245
+      }
+    },
+    "solar_zenith_angle_deg": {
+      "records_total": 471708,
+      "measurement_key_present": 471708,
+      "measurement_key_present_pct": 100.0,
+      "measurement_key_missing": 0,
+      "measurement_explicit_null": 0,
+      "measurement_non_object": 0,
+      "measurement_object_present": 471708,
+      "value_key_missing": 0,
+      "value_explicit_null": 0,
+      "numeric_values": 471708,
+      "non_numeric_values": 0,
+      "non_finite_values": 0,
+      "candidate_sentinel_values": 0,
+      "valid_numeric_values": 471708,
+      "measurement_types": {},
+      "value_types": {
+        "float": 467015,
+        "int": 4693
+      },
+      "metadata": {
+        "units": {
+          "\"deg\"": 471708
+        },
+        "source_levels": {
+          "\"derived\"": 471708
+        },
+        "source_products": {
+          "\"ANC\"": 471708
+        },
+        "source_channels": {
+          "\"SOLAR_ZENITHAL_ANGLE\"": 471708
+        }
+      },
+      "statistics": {
+        "count": 471708,
+        "min": 3.8,
+        "max": 138.96,
+        "mean": 80.2777277468276,
+        "population_std": 42.7380808651612,
+        "zero_count": 0,
+        "negative_count": 0,
+        "positive_count": 471708
+      }
+    },
+    "upward_lw_irradiance_cal_w_m2": {
+      "records_total": 471708,
+      "measurement_key_present": 471471,
+      "measurement_key_present_pct": 99.949757,
+      "measurement_key_missing": 237,
+      "measurement_explicit_null": 0,
+      "measurement_non_object": 0,
+      "measurement_object_present": 471471,
+      "value_key_missing": 0,
+      "value_explicit_null": 0,
+      "numeric_values": 471471,
+      "non_numeric_values": 0,
+      "non_finite_values": 0,
+      "candidate_sentinel_values": 0,
+      "valid_numeric_values": 471471,
+      "measurement_types": {},
+      "value_types": {
+        "float": 466778,
+        "int": 4693
+      },
+      "metadata": {
+        "units": {
+          "\"W/m2\"": 471471
+        },
+        "source_levels": {
+          "\"calibrated\"": 471471
+        },
+        "source_products": {
+          "\"TIRS\"": 471471
+        },
+        "source_channels": {
+          "\"UPWARD_LW_IRRADIANCE\"": 471471
+        }
+      },
+      "statistics": {
+        "count": 471471,
+        "min": 28.63,
+        "max": 161.41,
+        "mean": 66.48240555622769,
+        "population_std": 35.65649176606368,
+        "zero_count": 0,
+        "negative_count": 0,
+        "positive_count": 471471
+      }
+    },
+    "upward_lw_irradiance_derived_w_m2": {
+      "records_total": 471708,
+      "measurement_key_present": 471471,
+      "measurement_key_present_pct": 99.949757,
+      "measurement_key_missing": 237,
+      "measurement_explicit_null": 0,
+      "measurement_non_object": 0,
+      "measurement_object_present": 471471,
+      "value_key_missing": 0,
+      "value_explicit_null": 0,
+      "numeric_values": 471471,
+      "non_numeric_values": 0,
+      "non_finite_values": 0,
+      "candidate_sentinel_values": 0,
+      "valid_numeric_values": 471471,
+      "measurement_types": {},
+      "value_types": {
+        "float": 466737,
+        "int": 4734
+      },
+      "metadata": {
+        "units": {
+          "\"W/m2\"": 471471
+        },
+        "source_levels": {
+          "\"derived\"": 471471
+        },
+        "source_products": {
+          "\"TIRS\"": 471471
+        },
+        "source_channels": {
+          "\"UPWARD_LW_IRRADIANCE\"": 471471
+        }
+      },
+      "statistics": {
+        "count": 471471,
+        "min": 89.74,
+        "max": 353.82,
+        "mean": 168.04995766442084,
+        "population_std": 71.45105697843837,
+        "zero_count": 0,
+        "negative_count": 0,
+        "positive_count": 471471
+      }
+    },
+    "upward_sw_irradiance_w_m2": {
+      "records_total": 471708,
+      "measurement_key_present": 471471,
+      "measurement_key_present_pct": 99.949757,
+      "measurement_key_missing": 237,
+      "measurement_explicit_null": 0,
+      "measurement_non_object": 0,
+      "measurement_object_present": 471471,
+      "value_key_missing": 0,
+      "value_explicit_null": 0,
+      "numeric_values": 471471,
+      "non_numeric_values": 0,
+      "non_finite_values": 0,
+      "candidate_sentinel_values": 0,
+      "valid_numeric_values": 471471,
+      "measurement_types": {},
+      "value_types": {
+        "float": 459613,
+        "int": 11858
+      },
+      "metadata": {
+        "units": {
+          "\"W/m2\"": 471471
+        },
+        "source_levels": {
+          "\"calibrated\"": 471471
+        },
+        "source_products": {
+          "\"TIRS\"": 471471
+        },
+        "source_channels": {
+          "\"UPWARD_SW_IRRADIANCE\"": 471471
+        }
+      },
+      "statistics": {
+        "count": 471471,
+        "min": -0.38,
+        "max": 70.71,
+        "mean": 22.02042151054878,
+        "population_std": 25.23991651374088,
+        "zero_count": 9202,
+        "negative_count": 76999,
+        "positive_count": 385270
+      }
+    },
+    "volume_mixing_ratio": {
+      "records_total": 471708,
+      "measurement_key_present": 90501,
+      "measurement_key_present_pct": 19.18581,
+      "measurement_key_missing": 381207,
+      "measurement_explicit_null": 0,
+      "measurement_non_object": 0,
+      "measurement_object_present": 90501,
+      "value_key_missing": 0,
+      "value_explicit_null": 0,
+      "numeric_values": 90501,
+      "non_numeric_values": 0,
+      "non_finite_values": 0,
+      "candidate_sentinel_values": 0,
+      "valid_numeric_values": 90501,
+      "measurement_types": {},
+      "value_types": {
+        "float": 89647,
+        "int": 854
+      },
+      "metadata": {
+        "units": {},
+        "source_levels": {
+          "\"derived\"": 90501
+        },
+        "source_products": {
+          "\"RHS\"": 90501
+        },
+        "source_channels": {
+          "\"VOLUME_MIXING_RATIO\"": 90501
+        }
+      },
+      "statistics": {
+        "count": 90501,
+        "min": 12.99,
+        "max": 45.81,
+        "mean": 27.11401675119604,
+        "population_std": 5.192695660286453,
+        "zero_count": 0,
+        "negative_count": 0,
+        "positive_count": 90501
+      }
+    },
+    "wind_direction_deg": {
+      "records_total": 471708,
+      "measurement_key_present": 361534,
+      "measurement_key_present_pct": 76.643602,
+      "measurement_key_missing": 110174,
+      "measurement_explicit_null": 0,
+      "measurement_non_object": 0,
+      "measurement_object_present": 361534,
+      "value_key_missing": 0,
+      "value_explicit_null": 0,
+      "numeric_values": 361534,
+      "non_numeric_values": 0,
+      "non_finite_values": 0,
+      "candidate_sentinel_values": 9676,
+      "valid_numeric_values": 351858,
+      "measurement_types": {},
+      "value_types": {
+        "float": 351039,
+        "int": 10495
+      },
+      "metadata": {
+        "units": {
+          "\"deg\"": 361534
+        },
+        "source_levels": {
+          "\"derived\"": 361534
+        },
+        "source_products": {
+          "\"WS\"": 361534
+        },
+        "source_channels": {
+          "\"WIND_DIRECTION\"": 361534
+        }
+      },
+      "statistics": {
+        "count": 351858,
+        "min": 1.98,
+        "max": 359.27,
+        "mean": 177.68121963973877,
+        "population_std": 95.62817903616472,
+        "zero_count": 0,
+        "negative_count": 0,
+        "positive_count": 351858
+      }
+    }
+  }
+}
