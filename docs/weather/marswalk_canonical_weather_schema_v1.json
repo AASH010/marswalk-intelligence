@@ -1,0 +1,319 @@
+{
+  "schema_name": "MarsWalk Canonical Weather Schema",
+  "schema_version": "1.0.0-draft",
+  "status": "design_specification_not_implemented",
+  "mission": "Mars 2020 Perseverance MEDA",
+  "coverage": {
+    "sol_start": 230,
+    "sol_end": 239
+  },
+  "design_principles": [
+    "Preserve raw NASA CSV/XML files unchanged.",
+    "Keep each source observation and source channel traceable.",
+    "Do not equate measurements with different physical definitions.",
+    "Do not convert missing or invalid values to zero.",
+    "Keep calibrated channels and derived retrievals distinct unless equivalence is scientifically established.",
+    "Do not represent MEDA point observations as per-map-cell measurements."
+  ],
+  "record_identity": {
+    "sol": {
+      "type": "integer",
+      "required": true,
+      "description": "Mars solar day parsed from product identity/metadata."
+    },
+    "sclk_s": {
+      "type": "number",
+      "unit": "s",
+      "required": true,
+      "description": "MEDA spacecraft clock value; primary within-product observation key."
+    },
+    "lmst": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "required": false,
+      "description": "Local Mean Solar Time, preserved as source string."
+    },
+    "ltst": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "required": false,
+      "description": "Local True Solar Time, preserved as source string."
+    },
+    "utc": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "format": "date-time",
+      "required": false,
+      "description": "Only populate after validated SCLK-to-UTC correlation; do not infer from row position."
+    },
+    "source": {
+      "source_level": [
+        "derived",
+        "calibrated"
+      ],
+      "product": [
+        "ANC",
+        "PS",
+        "RHS",
+        "TIRS",
+        "WS",
+        "ATS",
+        "RDS"
+      ],
+      "source_file": "string",
+      "source_channel": "string",
+      "source_version": "string|null",
+      "pds_urn": "string|null"
+    }
+  },
+  "variables": {
+    "pressure_pa": {
+      "type": "number|null",
+      "unit": "Pa",
+      "preferred_source": "DER_PS.PRESSURE",
+      "calibrated_sources": [
+        "CAL_PS.BAROCAP1_PRESSURE",
+        "CAL_PS.BAROCAP2_PRESSURE",
+        "CAL_PS.BAROCAP3_PRESSURE"
+      ],
+      "policy": "Keep the three calibrated Barocap channels separate. Derived pressure may be the canonical summary input when valid. Preserve transducer and measurement mode metadata."
+    },
+    "relative_humidity_pct": {
+      "type": "number|null",
+      "unit": "%RH",
+      "preferred_source": "DER_RHS.LOCAL_RELATIVE_HUMIDITY",
+      "calibrated_sources": [
+        "CAL_RHS.HUMICAP_A_HUMIDITY",
+        "CAL_RHS.HUMICAP_B_HUMIDITY"
+      ],
+      "policy": "Preserve A and B independently. Derived RHS missing for Sol 232 in the supplied archive; do not silently impute. If a calibrated fallback is used, mark source_level/channel and keep the fallback explicit. Humidity unit is not stated in the inspected XML; confirm from MEDA documentation before production use."
+    },
+    "humidity_sensor_temperature_k": {
+      "type": "number|null",
+      "unit": "K",
+      "preferred_source": "DER_RHS.HUMIDITY_LOCAL_TEMP",
+      "calibrated_sources": [
+        "CAL_RHS.HUMICAP_TEMP",
+        "CAL_RHS.THERMOCAP1_TEMP",
+        "CAL_RHS.THERMOCAP2_TEMP"
+      ],
+      "policy": "Keep physical sensor channels separate; do not average sensor temperatures without calibration rationale."
+    },
+    "air_temperature_k": {
+      "type": "number|null",
+      "unit": "K",
+      "preferred_source": "CAL_TIRS.AIR_TEMP",
+      "calibrated_sources": [
+        "CAL_ATS.ATS_LOCAL_TEMP1..ATS_LOCAL_TEMP5"
+      ],
+      "policy": "ATS channels are local temperatures at different locations; preserve all five channels and do not average them into air temperature without sensor-position/interpretation review."
+    },
+    "ground_brightness_temperature_k": {
+      "type": "number|null",
+      "unit": "K",
+      "preferred_source": "CAL_TIRS.GROUND_TEMP",
+      "policy": "Brightness temperature; do not relabel as direct surface thermodynamic temperature without qualification."
+    },
+    "downward_lw_irradiance_cal_w_m2": {
+      "type": "number|null",
+      "unit": "W/m^2",
+      "source": "CAL_TIRS.DOWNWARD_LW_IRRADIANCE",
+      "policy": "Bandpass 6.5–30 μm calibrated channel; retain uncertainty and relevant TIRS flags."
+    },
+    "downward_lw_irradiance_derived_w_m2": {
+      "type": "number|null",
+      "unit": "W/m^2",
+      "source": "DER_TIRS.DOWNWARD_LW_IRRADIANCE",
+      "policy": "Derived hemispherical estimate assuming blackbody model and Stefan–Boltzmann emission. Keep separate from calibrated bandpass quantity."
+    },
+    "upward_lw_irradiance_cal_w_m2": {
+      "type": "number|null",
+      "unit": "W/m^2",
+      "source": "CAL_TIRS.UPWARD_LW_IRRADIANCE",
+      "policy": "Calibrated bandpass quantity; retain uncertainty."
+    },
+    "upward_lw_irradiance_derived_w_m2": {
+      "type": "number|null",
+      "unit": "W/m^2",
+      "source": "DER_TIRS.UPWARD_LW_IRRADIANCE",
+      "policy": "Derived hemispherical estimate; do not merge with calibrated bandpass value."
+    },
+    "upward_sw_irradiance_w_m2": {
+      "type": "number|null",
+      "unit": "W/m^2",
+      "source": "CAL_TIRS.UPWARD_SW_IRRADIANCE",
+      "policy": "Calibrated source only in supplied collection."
+    },
+    "wind_horizontal_speed_derived_m_s": {
+      "type": "number|null",
+      "unit": "m/s",
+      "source": "DER_WS.HORIZONTAL_WIND_SPEED",
+      "policy": "Preferred combined retrieval when valid; preserve BOTH_BOOMS_USED_FOR_RETRIEVAL and ROVER_STILL."
+    },
+    "wind_vertical_speed_derived_m_s": {
+      "type": "number|null",
+      "unit": "m/s",
+      "source": "DER_WS.VERTICAL_WIND_SPEED",
+      "policy": "Retain separately; do not assume complete coverage."
+    },
+    "wind_direction_derived_deg": {
+      "type": "number|null",
+      "unit": "degree",
+      "source": "DER_WS.WIND_DIRECTION",
+      "policy": "Circular variable; use circular statistics, not arithmetic mean. Confirm direction convention before interpreting as from/to."
+    },
+    "wind_boom1_horizontal_speed_m_s": {
+      "type": "number|null",
+      "unit": "m/s",
+      "source": "CAL_WS.BOOM1_HORIZONTAL_WIND_SPEED",
+      "policy": "Keep boom channels independent; retain algorithm stability flag."
+    },
+    "wind_boom2_horizontal_speed_m_s": {
+      "type": "number|null",
+      "unit": "m/s",
+      "source": "CAL_WS.BOOM2_HORIZONTAL_WIND_SPEED",
+      "policy": "Keep boom channels independent; retain algorithm stability flag."
+    },
+    "wind_boom1_direction_deg": {
+      "type": "number|null",
+      "unit": "degree",
+      "source": "CAL_WS.BOOM1_WIND_DIRECTION",
+      "policy": "Circular variable; keep independent of boom 2."
+    },
+    "wind_boom2_direction_deg": {
+      "type": "number|null",
+      "unit": "degree",
+      "source": "CAL_WS.BOOM2_WIND_DIRECTION",
+      "policy": "Circular variable; keep independent of boom 1."
+    },
+    "solar_longitude_deg": {
+      "type": "number|null",
+      "unit": "degree",
+      "source": "DER_ANCILLARY.SOLAR_LONGITUDE_ANGLE",
+      "policy": "Solar geometry metadata; not a local weather measurement."
+    },
+    "solar_zenith_angle_deg": {
+      "type": "number|null",
+      "unit": "degree",
+      "source": "DER_ANCILLARY.SOLAR_ZENITHAL_ANGLE",
+      "policy": "Solar geometry metadata; preserve the PDS definition/convention."
+    },
+    "rover_position_m2020_topo_m": {
+      "type": "object|null",
+      "unit": "m",
+      "source": "DER_ANCILLARY.ROVER_POSITION_X/Y/Z",
+      "policy": "Coordinates are in M2020_TOPO relative to landing site. Transform to project map CRS before spatial use."
+    },
+    "rds_channels": {
+      "type": "object",
+      "source": "CAL_RDS.RDS_LAT_1..8, RDS_TOP_1..8 and corresponding _HG channels",
+      "policy": "Retain channel-by-channel, mount, gain mode, and native units. Do not combine normal/high-gain channels or label these as dust opacity/concentration without a validated retrieval."
+    }
+  },
+  "quality": {
+    "raw_value": "Preserve original source value where practical.",
+    "normalized_value": "Null for empty, non-finite, or documented invalid sentinel values.",
+    "validity_status": [
+      "valid",
+      "missing",
+      "invalid_sentinel",
+      "flagged",
+      "not_assessed"
+    ],
+    "quality_flags": {
+      "DER_WS": [
+        "BOTH_BOOMS_USED_FOR_RETRIEVAL",
+        "ROVER_STILL"
+      ],
+      "CAL_WS": [
+        "BOOM1_ALG_IN_STABLE_STATE",
+        "BOOM2_ALG_IN_STABLE_STATE",
+        "ROVER_STILL"
+      ],
+      "TIRS": [
+        "RSM_HEAD_OUTSIDE_TIRS_UPWARD_LOOKING_FOV",
+        "WHEEL_OUTSIDE_TIRS_DOWNWARD_LOOKING_FOV",
+        "SUN_OUTSIDE_TIRS_FOV",
+        "ROVER_LOW_TILT",
+        "TIRS_GROUND_FOOTPRINT_NOT_IN_SHADOW",
+        "ROVER_HGA_OFF",
+        "SKYCAM_OFF",
+        "ROVER_STILL"
+      ],
+      "RDS": [
+        "ROVER_HGA_STILL",
+        "ROVER_STILL"
+      ]
+    },
+    "rules": [
+      "Do not treat zero as missing by default.",
+      "Map the observed WS sentinel 999999999 to null only after confirming it is the invalid sentinel for the relevant field.",
+      "Do not reject extreme wind values solely because they are extreme; inspect quality flags and source documentation.",
+      "Do not map all flag values of 1 to good; interpret each flag according to its own definition.",
+      "Store missingness reason and source field."
+    ]
+  },
+  "time_and_join_policy": {
+    "primary_key_within_source": [
+      "sol",
+      "sclk_s",
+      "source.product"
+    ],
+    "join_rule": "Never join products by row number. Exact SCLK matching only when exact and semantically appropriate; otherwise use explicitly defined time bins/as-of matching with a documented tolerance.",
+    "utc_rule": "Use validated SPICE/PDS SCLK correlation for UTC. Product-level start/stop UTC is not a per-row UTC timestamp.",
+    "aggregation": "Aggregate each variable from its own valid observations within explicit time windows; report n_valid, n_missing, coverage, first/last observation, and variability."
+  },
+  "aggregation_policy": {
+    "linear_variables": [
+      "pressure_pa",
+      "relative_humidity_pct",
+      "air_temperature_k",
+      "ground_brightness_temperature_k",
+      "irradiance variables",
+      "wind speed variables"
+    ],
+    "circular_variables": [
+      "wind_direction_derived_deg",
+      "wind_boom1_direction_deg",
+      "wind_boom2_direction_deg"
+    ],
+    "circular_statistics": [
+      "circular_mean_deg",
+      "resultant_length",
+      "circular_std_deg"
+    ],
+    "per_sol": "Compute per-Sol statistics first, then pooled observation-weighted statistics. Also report equal-Sol-weighted mean where useful; do not replace one with the other.",
+    "summary_statistics": [
+      "count_total",
+      "count_valid",
+      "count_missing",
+      "missing_ratio",
+      "mean",
+      "median",
+      "min",
+      "max",
+      "std",
+      "first_time",
+      "last_time"
+    ],
+    "uncertainty": "Retain source uncertainty fields; do not synthesize uncertainty where source values are absent."
+  },
+  "downstream_usage": {
+    "weather_summary_api": "GET /api/v1/weather/summary",
+    "weather_analysis_api": "POST /api/v1/weather/analyze",
+    "routing": "Weather Service may provide mission/route-level weather factors. A spatial per-cell weather cost requires a separately justified spatial exposure model; MEDA alone is a point/time series and is not a weather raster.",
+    "eva_consumables": "Use validated weather analysis as an explicit modifier; preserve baseline consumables and weather-adjusted values separately.",
+    "frontend": "Expose one unified weather profile; do not expose individual Sol selection as a required UI workflow."
+  },
+  "known_archive_gaps": [
+    "Derived RHS Sol 232 absent in the supplied derived archive.",
+    "Several uncertainty and housekeeping columns are entirely or mostly empty; retain schema fields but mark unavailable per observation.",
+    "No Derived RDS product is present in the supplied selected Derived collection; use calibrated RDS channels only."
+  ]
+}
