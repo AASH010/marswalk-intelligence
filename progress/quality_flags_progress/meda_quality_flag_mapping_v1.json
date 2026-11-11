@@ -1,0 +1,205 @@
+{
+  "schema_version": "1.0.0",
+  "report": "MEDA_SCIENTIFIC_VALIDATION_QUALITY_FLAG_MAPPING_V1.md",
+  "date": "2026-11-11",
+  "scope": {
+    "sol_start": 230,
+    "sol_end": 239,
+    "products": ["CAL_WS", "CAL_RDS", "CAL_TIRS", "DER_WS", "DER_TIRS"],
+    "source": "PDS4 XML labels paired with source CSV files"
+  },
+  "policy": {
+    "one_means": "the specific good condition described by the field is present",
+    "zero_means": "the specific bad condition described by the field is present",
+    "blank_means": "unknown_or_unavailable; never coerce to zero or one",
+    "automatic_filtering": false,
+    "application_status": "semantics_mapped_policy_not_applied"
+  },
+  "flags": [
+    {
+      "product": "CAL_WS",
+      "csv_field": "BOOM1_ALG_STATE_STABLE",
+      "xml_field": "BOOM1_ALG_IN_STABLE_STATE",
+      "field_number": 16,
+      "zero": "Boom 1 control algorithm is changing state",
+      "one": "Boom 1 control algorithm is not changing state",
+      "counts": {"0": 4843, "1": 356486, "blank": 0},
+      "affects": ["boom1_wind_measurements"],
+      "role": "algorithm_state_context",
+      "mapping_confidence": "high_description_and_field_position_match_but_label_header_name_mismatch",
+      "filter_policy": "pending"
+    },
+    {
+      "product": "CAL_WS",
+      "csv_field": "BOOM2_ALG_STATE_STABLE",
+      "xml_field": "BOOM2_ALG_IN_STABLE_STATE",
+      "field_number": 17,
+      "zero": "Boom 2 control algorithm is changing state",
+      "one": "Boom 2 control algorithm is not changing state",
+      "counts": {"0": 4602, "1": 356727, "blank": 0},
+      "affects": ["boom2_wind_measurements"],
+      "role": "algorithm_state_context",
+      "mapping_confidence": "high_description_and_field_position_match_but_label_header_name_mismatch",
+      "filter_policy": "pending"
+    },
+    {
+      "product": "CAL_WS",
+      "csv_field": "ROVER_STILL",
+      "field_number": 18,
+      "zero": "Rover is moving",
+      "one": "Rover is motionless",
+      "counts": {"0": 625, "1": 360704, "blank": 0},
+      "affects": ["wind_measurements_context"],
+      "role": "rover_motion_context",
+      "filter_policy": "pending_not_a_global_invalidity_flag"
+    },
+    {
+      "product": "CAL_RDS",
+      "csv_field": "ROVER_HGA_STILL",
+      "field_number": 36,
+      "zero": "HGA antenna is moving",
+      "one": "HGA antenna is motionless",
+      "counts": {"blank": 469915},
+      "affects": ["RDS_measurements_context"],
+      "role": "instrument_geometry_context",
+      "availability": "all_blank_in_supplied_data",
+      "filter_policy": "do_not_use_until_populated"
+    },
+    {
+      "product": "CAL_RDS",
+      "csv_field": "ROVER_STILL",
+      "field_number": 37,
+      "zero": "Rover is moving",
+      "one": "Rover is motionless",
+      "counts": {"0": 625, "1": 469290, "blank": 0},
+      "affects": ["RDS_measurements_context"],
+      "role": "rover_motion_context",
+      "filter_policy": "pending_not_a_global_invalidity_flag"
+    },
+    {
+      "product": "CAL_TIRS_AND_DER_TIRS",
+      "csv_field": "RSM_HEAD_OUTSIDE_TIRS_UPWARD_LOOKING_FOV",
+      "field_number": 14,
+      "zero": "RSM head obstructs the upward-looking channels field of view",
+      "one": "RSM head is outside the upward-looking channels field of view",
+      "counts_per_product": {"0": 471471, "1": 0, "blank": 0},
+      "affects": ["affected_TIRS_upward_looking_channels"],
+      "role": "field_of_view_obstruction_context",
+      "investigation_required": "all_zero_distribution",
+      "filter_policy": "pending_scoped_to_affected_channels"
+    },
+    {
+      "product": "CAL_TIRS_AND_DER_TIRS",
+      "csv_field": "WHEEL_OUTSIDE_TIRS_DOWNWARD_LOOKING_FOV",
+      "field_number": 15,
+      "zero": "Front-right wheel obstructs the downward-looking channels field of view",
+      "one": "Front-right wheel is outside the downward-looking channels field of view",
+      "counts_per_product": {"blank": 471471},
+      "affects": ["affected_TIRS_downward_looking_channels"],
+      "role": "field_of_view_obstruction_context",
+      "availability": "all_blank_in_supplied_data",
+      "filter_policy": "do_not_coerce_blank_to_zero"
+    },
+    {
+      "product": "CAL_TIRS_AND_DER_TIRS",
+      "csv_field": "SUN_OUTSIDE_TIRS_FOV",
+      "field_number": 16,
+      "zero": "Sun is inside the TIRS upward-looking and upward shortwave irradiance channels field of view",
+      "one": "Sun is outside that field of view",
+      "counts_per_product": {"0": 38288, "1": 433183, "blank": 0},
+      "affects": ["affected_upward_TIRS_channels", "upward_sw_irradiance"],
+      "role": "solar_geometry_context",
+      "filter_policy": "pending_scoped_to_affected_channels"
+    },
+    {
+      "product": "CAL_TIRS_AND_DER_TIRS",
+      "csv_field": "ROVER_LOW_TILT",
+      "field_number": 17,
+      "zero": "High rover tilt at or above the stated plus/minus 20 degree criterion",
+      "one": "Low rover tilt at or below the stated plus/minus 20 degree criterion",
+      "counts_per_product": {"0": 0, "1": 471471, "blank": 0},
+      "affects": ["TIRS_field_of_view_interpretation"],
+      "role": "rover_geometry_context",
+      "investigation_required": "all_one_distribution_and_source_threshold_interpretation",
+      "filter_policy": "pending"
+    },
+    {
+      "product": "CAL_TIRS_AND_DER_TIRS",
+      "csv_field": "TIRS_GROUND_FOOTPRINT_NOT_IN_SHADOW",
+      "field_number": 18,
+      "zero": "Ground focused area is shadowed by the rover",
+      "one": "Ground focused area is not shadowed by the rover",
+      "counts_per_product": {"0": 64722, "1": 406749, "blank": 0},
+      "affects": ["TIRS_ground_footprint_measurements"],
+      "role": "ground_shadow_context",
+      "filter_policy": "pending_scoped_to_ground_footprint_channels"
+    },
+    {
+      "product": "CAL_TIRS_AND_DER_TIRS",
+      "csv_field": "ROVER_HGA_OFF",
+      "field_number": 19,
+      "zero": "Rover HGA antenna is on",
+      "one": "Rover HGA antenna is off",
+      "counts_per_product": {"blank": 471471},
+      "affects": ["TIRS_measurements_context"],
+      "role": "rover_hga_context",
+      "availability": "all_blank_in_supplied_data",
+      "filter_policy": "do_not_coerce_blank_to_zero"
+    },
+    {
+      "product": "CAL_TIRS_AND_DER_TIRS",
+      "csv_field": "SKYCAM_OFF",
+      "field_number": 20,
+      "zero": "SkyCam is on",
+      "one": "SkyCam is off",
+      "counts_per_product": {"blank": 471471},
+      "affects": ["TIRS_measurements_context"],
+      "role": "instrument_context",
+      "availability": "all_blank_in_supplied_data",
+      "filter_policy": "do_not_coerce_blank_to_zero"
+    },
+    {
+      "product": "CAL_TIRS_AND_DER_TIRS",
+      "csv_field": "ROVER_STILL",
+      "field_number": 21,
+      "zero": "Rover is moving",
+      "one": "Rover is motionless",
+      "counts_per_product": {"0": 707, "1": 470764, "blank": 0},
+      "affects": ["TIRS_measurements_context"],
+      "role": "rover_motion_context",
+      "filter_policy": "pending_not_a_global_invalidity_flag"
+    },
+    {
+      "product": "DER_WS",
+      "csv_field": "BOTH_BOOMS_USED_FOR_RETRIEVAL",
+      "field_number": 10,
+      "zero": "Only one boom was powered on and used to determine wind",
+      "one": "Both booms were used to determine wind",
+      "counts": {"blank": 361534},
+      "affects": ["derived_wind_retrieval_context"],
+      "role": "retrieval_context",
+      "availability": "all_blank_in_supplied_data",
+      "filter_policy": "do_not_coerce_blank_to_zero"
+    },
+    {
+      "product": "DER_WS",
+      "csv_field": "ROVER_STILL",
+      "field_number": 11,
+      "zero": "Rover is moving",
+      "one": "Rover is motionless",
+      "counts": {"0": 625, "1": 360909, "blank": 0},
+      "affects": ["derived_wind_measurements_context"],
+      "role": "rover_motion_context",
+      "filter_policy": "pending_not_a_global_invalidity_flag"
+    }
+  ],
+  "non_flag_metadata": [
+    {"product": "CAL_PS", "field": "PRESSURE_MEASUREMENT_MODE", "values": ["nominal", "high resolution"], "role": "categorical_operating_mode"},
+    {"product": "CAL_PS_AND_DER_PS", "field": "TRANSDUCER", "values": ["1", "2"], "role": "transducer_identifier"}
+  ],
+  "unresolved": [
+    {"id": "U-001", "item": "999999999 in DER_WS horizontal wind speed and wind direction", "count_per_field": 9676, "status": "candidate_sentinel_not_confirmed_by_supplied_XML", "action": "confirm in authoritative MEDA RDR SIS or release notes"},
+    {"id": "U-002", "item": "CAL_WS XML field names differ from CSV headers for Boom 1 and Boom 2 algorithm flags", "status": "documented_discrepancy", "action": "retain both identifiers and reconcile against RDR SIS"},
+    {"id": "U-003", "item": "TIRS all-zero RSM-head flag and all-one low-tilt flag", "status": "distribution_requires_investigation", "action": "inspect source SIS, geometry, and exact data lineage before filtering"}
+  ]
+}
