@@ -1,18 +1,22 @@
 {
   "report_name": "MEDA Variable-Level QA",
-  "report_version": "1.0.0",
+  "report_version": "2.0.0",
   "input_file": "D:\\projects\\project MWI\\marswalk-intelligence\\resources\\MEDA_Weather_ds\\processed\\meda_normalized.jsonl",
   "methodology": {
-    "processing_mode": "streaming_jsonl",
+    "processing_mode": "two_pass_streaming_jsonl",
+    "pass_1": "Discover the union of measurement variable names.",
+    "pass_2": "Analyze every discovered variable across every valid JSON object record, including missing keys.",
     "variable_discovery": "dynamic",
+    "records_total_definition": "Number of valid JSON object records. Each discovered variable is evaluated against this same denominator.",
     "statistics_algorithm": "Welford_online",
     "standard_deviation": "population",
-    "sentinel_policy": "999999999 is treated as a candidate sentinel. It is counted but excluded from descriptive statistics. This policy requires source-document validation before being considered definitive.",
+    "sentinel_policy": "999999999 is treated as a candidate sentinel. It is counted but excluded from descriptive statistics. Source-document validation is still required before treating this as definitive.",
     "quality_policy": "Quality values are counted without assigning scientific meaning to them.",
     "threshold_policy": "No physical validity thresholds are applied."
   },
   "dataset": {
     "records_scanned": 471708,
+    "object_records": 471708,
     "invalid_json_lines": 0,
     "non_object_records": 0,
     "missing_sol_records": 0,
@@ -35,8 +39,10 @@
   },
   "variables": {
     "air_temp_k": {
-      "records_total": 471471,
-      "measurement_key_missing": 0,
+      "records_total": 471708,
+      "measurement_key_present": 471471,
+      "measurement_key_present_pct": 99.949757,
+      "measurement_key_missing": 237,
       "measurement_explicit_null": 0,
       "measurement_non_object": 0,
       "measurement_object_present": 471471,
@@ -47,6 +53,7 @@
       "non_finite_values": 0,
       "candidate_sentinel_values": 0,
       "valid_numeric_values": 471471,
+      "measurement_types": {},
       "value_types": {
         "float": 466818,
         "int": 4653
@@ -77,8 +84,10 @@
       }
     },
     "ats_local_temp_1_k": {
-      "records_total": 471482,
-      "measurement_key_missing": 0,
+      "records_total": 471708,
+      "measurement_key_present": 471482,
+      "measurement_key_present_pct": 99.952089,
+      "measurement_key_missing": 226,
       "measurement_explicit_null": 0,
       "measurement_non_object": 0,
       "measurement_object_present": 471482,
@@ -89,6 +98,7 @@
       "non_finite_values": 0,
       "candidate_sentinel_values": 0,
       "valid_numeric_values": 471482,
+      "measurement_types": {},
       "value_types": {
         "float": 466782,
         "int": 4700
@@ -119,8 +129,10 @@
       }
     },
     "ats_local_temp_2_k": {
-      "records_total": 471482,
-      "measurement_key_missing": 0,
+      "records_total": 471708,
+      "measurement_key_present": 471482,
+      "measurement_key_present_pct": 99.952089,
+      "measurement_key_missing": 226,
       "measurement_explicit_null": 0,
       "measurement_non_object": 0,
       "measurement_object_present": 471482,
@@ -131,6 +143,7 @@
       "non_finite_values": 0,
       "candidate_sentinel_values": 0,
       "valid_numeric_values": 471482,
+      "measurement_types": {},
       "value_types": {
         "float": 466660,
         "int": 4822
@@ -161,8 +174,10 @@
       }
     },
     "ats_local_temp_3_k": {
-      "records_total": 471482,
-      "measurement_key_missing": 0,
+      "records_total": 471708,
+      "measurement_key_present": 471482,
+      "measurement_key_present_pct": 99.952089,
+      "measurement_key_missing": 226,
       "measurement_explicit_null": 0,
       "measurement_non_object": 0,
       "measurement_object_present": 471482,
@@ -173,6 +188,7 @@
       "non_finite_values": 0,
       "candidate_sentinel_values": 0,
       "valid_numeric_values": 471482,
+      "measurement_types": {},
       "value_types": {
         "float": 466674,
         "int": 4808
@@ -203,8 +219,10 @@
       }
     },
     "ats_local_temp_4_k": {
-      "records_total": 471482,
-      "measurement_key_missing": 0,
+      "records_total": 471708,
+      "measurement_key_present": 471482,
+      "measurement_key_present_pct": 99.952089,
+      "measurement_key_missing": 226,
       "measurement_explicit_null": 0,
       "measurement_non_object": 0,
       "measurement_object_present": 471482,
@@ -215,6 +233,7 @@
       "non_finite_values": 0,
       "candidate_sentinel_values": 0,
       "valid_numeric_values": 471482,
+      "measurement_types": {},
       "value_types": {
         "float": 466821,
         "int": 4661
@@ -245,8 +264,10 @@
       }
     },
     "ats_local_temp_5_k": {
-      "records_total": 471482,
-      "measurement_key_missing": 0,
+      "records_total": 471708,
+      "measurement_key_present": 471482,
+      "measurement_key_present_pct": 99.952089,
+      "measurement_key_missing": 226,
       "measurement_explicit_null": 0,
       "measurement_non_object": 0,
       "measurement_object_present": 471482,
@@ -257,6 +278,7 @@
       "non_finite_values": 0,
       "candidate_sentinel_values": 0,
       "valid_numeric_values": 471482,
+      "measurement_types": {},
       "value_types": {
         "float": 466734,
         "int": 4748
@@ -287,8 +309,10 @@
       }
     },
     "boom1_horizontal_wind_speed_m_s": {
-      "records_total": 356486,
-      "measurement_key_missing": 0,
+      "records_total": 471708,
+      "measurement_key_present": 356486,
+      "measurement_key_present_pct": 75.573448,
+      "measurement_key_missing": 115222,
       "measurement_explicit_null": 0,
       "measurement_non_object": 0,
       "measurement_object_present": 356486,
@@ -299,6 +323,7 @@
       "non_finite_values": 0,
       "candidate_sentinel_values": 0,
       "valid_numeric_values": 356486,
+      "measurement_types": {},
       "value_types": {
         "float": 347003,
         "int": 9483
@@ -329,8 +354,10 @@
       }
     },
     "boom1_wind_direction_deg": {
-      "records_total": 356486,
-      "measurement_key_missing": 0,
+      "records_total": 471708,
+      "measurement_key_present": 356486,
+      "measurement_key_present_pct": 75.573448,
+      "measurement_key_missing": 115222,
       "measurement_explicit_null": 0,
       "measurement_non_object": 0,
       "measurement_object_present": 356486,
@@ -341,6 +368,7 @@
       "non_finite_values": 0,
       "candidate_sentinel_values": 0,
       "valid_numeric_values": 356486,
+      "measurement_types": {},
       "value_types": {
         "float": 355389,
         "int": 1097
@@ -371,8 +399,10 @@
       }
     },
     "boom2_horizontal_wind_speed_m_s": {
-      "records_total": 356727,
-      "measurement_key_missing": 0,
+      "records_total": 471708,
+      "measurement_key_present": 356727,
+      "measurement_key_present_pct": 75.624539,
+      "measurement_key_missing": 114981,
       "measurement_explicit_null": 0,
       "measurement_non_object": 0,
       "measurement_object_present": 356727,
@@ -383,6 +413,7 @@
       "non_finite_values": 0,
       "candidate_sentinel_values": 0,
       "valid_numeric_values": 356727,
+      "measurement_types": {},
       "value_types": {
         "float": 353547,
         "int": 3180
@@ -413,8 +444,10 @@
       }
     },
     "boom2_wind_direction_deg": {
-      "records_total": 356727,
-      "measurement_key_missing": 0,
+      "records_total": 471708,
+      "measurement_key_present": 356727,
+      "measurement_key_present_pct": 75.624539,
+      "measurement_key_missing": 114981,
       "measurement_explicit_null": 0,
       "measurement_non_object": 0,
       "measurement_object_present": 356727,
@@ -425,6 +458,7 @@
       "non_finite_values": 0,
       "candidate_sentinel_values": 0,
       "valid_numeric_values": 356727,
+      "measurement_types": {},
       "value_types": {
         "float": 356421,
         "int": 306
@@ -455,8 +489,10 @@
       }
     },
     "downward_lw_irradiance_cal_w_m2": {
-      "records_total": 471471,
-      "measurement_key_missing": 0,
+      "records_total": 471708,
+      "measurement_key_present": 471471,
+      "measurement_key_present_pct": 99.949757,
+      "measurement_key_missing": 237,
       "measurement_explicit_null": 0,
       "measurement_non_object": 0,
       "measurement_object_present": 471471,
@@ -467,6 +503,7 @@
       "non_finite_values": 0,
       "candidate_sentinel_values": 0,
       "valid_numeric_values": 471471,
+      "measurement_types": {},
       "value_types": {
         "float": 466252,
         "int": 5219
@@ -497,8 +534,10 @@
       }
     },
     "downward_lw_irradiance_derived_w_m2": {
-      "records_total": 471471,
-      "measurement_key_missing": 0,
+      "records_total": 471708,
+      "measurement_key_present": 471471,
+      "measurement_key_present_pct": 99.949757,
+      "measurement_key_missing": 237,
       "measurement_explicit_null": 0,
       "measurement_non_object": 0,
       "measurement_object_present": 471471,
@@ -509,6 +548,7 @@
       "non_finite_values": 0,
       "candidate_sentinel_values": 0,
       "valid_numeric_values": 471471,
+      "measurement_types": {},
       "value_types": {
         "float": 466742,
         "int": 4729
@@ -539,8 +579,10 @@
       }
     },
     "ground_brightness_temp_k": {
-      "records_total": 471471,
-      "measurement_key_missing": 0,
+      "records_total": 471708,
+      "measurement_key_present": 471471,
+      "measurement_key_present_pct": 99.949757,
+      "measurement_key_missing": 237,
       "measurement_explicit_null": 0,
       "measurement_non_object": 0,
       "measurement_object_present": 471471,
@@ -551,6 +593,7 @@
       "non_finite_values": 0,
       "candidate_sentinel_values": 0,
       "valid_numeric_values": 471471,
+      "measurement_types": {},
       "value_types": {
         "float": 466698,
         "int": 4773
@@ -581,8 +624,10 @@
       }
     },
     "horizontal_wind_speed_m_s": {
-      "records_total": 361534,
-      "measurement_key_missing": 0,
+      "records_total": 471708,
+      "measurement_key_present": 361534,
+      "measurement_key_present_pct": 76.643602,
+      "measurement_key_missing": 110174,
       "measurement_explicit_null": 0,
       "measurement_non_object": 0,
       "measurement_object_present": 361534,
@@ -593,6 +638,7 @@
       "non_finite_values": 0,
       "candidate_sentinel_values": 9676,
       "valid_numeric_values": 351858,
+      "measurement_types": {},
       "value_types": {
         "float": 348197,
         "int": 13337
@@ -623,8 +669,10 @@
       }
     },
     "humidity_sensor_temp_cal_k": {
-      "records_total": 430089,
-      "measurement_key_missing": 0,
+      "records_total": 471708,
+      "measurement_key_present": 430089,
+      "measurement_key_present_pct": 91.176957,
+      "measurement_key_missing": 41619,
       "measurement_explicit_null": 0,
       "measurement_non_object": 0,
       "measurement_object_present": 430089,
@@ -635,6 +683,7 @@
       "non_finite_values": 0,
       "candidate_sentinel_values": 0,
       "valid_numeric_values": 430089,
+      "measurement_types": {},
       "value_types": {
         "float": 425948,
         "int": 4141
@@ -665,8 +714,10 @@
       }
     },
     "humidity_sensor_temp_k": {
-      "records_total": 382316,
-      "measurement_key_missing": 0,
+      "records_total": 471708,
+      "measurement_key_present": 382316,
+      "measurement_key_present_pct": 81.049293,
+      "measurement_key_missing": 89392,
       "measurement_explicit_null": 0,
       "measurement_non_object": 0,
       "measurement_object_present": 382316,
@@ -677,6 +728,7 @@
       "non_finite_values": 0,
       "candidate_sentinel_values": 0,
       "valid_numeric_values": 382316,
+      "measurement_types": {},
       "value_types": {
         "float": 378573,
         "int": 3743
@@ -707,8 +759,10 @@
       }
     },
     "humidity_thermocap1_temp_k": {
-      "records_total": 430089,
-      "measurement_key_missing": 0,
+      "records_total": 471708,
+      "measurement_key_present": 430089,
+      "measurement_key_present_pct": 91.176957,
+      "measurement_key_missing": 41619,
       "measurement_explicit_null": 0,
       "measurement_non_object": 0,
       "measurement_object_present": 430089,
@@ -719,6 +773,7 @@
       "non_finite_values": 0,
       "candidate_sentinel_values": 0,
       "valid_numeric_values": 430089,
+      "measurement_types": {},
       "value_types": {
         "float": 425755,
         "int": 4334
@@ -749,8 +804,10 @@
       }
     },
     "humidity_thermocap2_temp_k": {
-      "records_total": 430089,
-      "measurement_key_missing": 0,
+      "records_total": 471708,
+      "measurement_key_present": 430089,
+      "measurement_key_present_pct": 91.176957,
+      "measurement_key_missing": 41619,
       "measurement_explicit_null": 0,
       "measurement_non_object": 0,
       "measurement_object_present": 430089,
@@ -761,6 +818,7 @@
       "non_finite_values": 0,
       "candidate_sentinel_values": 0,
       "valid_numeric_values": 430089,
+      "measurement_types": {},
       "value_types": {
         "float": 425493,
         "int": 4596
@@ -791,8 +849,10 @@
       }
     },
     "pressure_barocap1_pa": {
-      "records_total": 468980,
-      "measurement_key_missing": 0,
+      "records_total": 471708,
+      "measurement_key_present": 468980,
+      "measurement_key_present_pct": 99.421676,
+      "measurement_key_missing": 2728,
       "measurement_explicit_null": 0,
       "measurement_non_object": 0,
       "measurement_object_present": 468980,
@@ -803,6 +863,7 @@
       "non_finite_values": 0,
       "candidate_sentinel_values": 0,
       "valid_numeric_values": 468980,
+      "measurement_types": {},
       "value_types": {
         "float": 464386,
         "int": 4594
@@ -833,8 +894,10 @@
       }
     },
     "pressure_barocap2_pa": {
-      "records_total": 468980,
-      "measurement_key_missing": 0,
+      "records_total": 471708,
+      "measurement_key_present": 468980,
+      "measurement_key_present_pct": 99.421676,
+      "measurement_key_missing": 2728,
       "measurement_explicit_null": 0,
       "measurement_non_object": 0,
       "measurement_object_present": 468980,
@@ -845,6 +908,7 @@
       "non_finite_values": 0,
       "candidate_sentinel_values": 0,
       "valid_numeric_values": 468980,
+      "measurement_types": {},
       "value_types": {
         "float": 464526,
         "int": 4454
@@ -875,8 +939,10 @@
       }
     },
     "pressure_barocap3_pa": {
-      "records_total": 468980,
-      "measurement_key_missing": 0,
+      "records_total": 471708,
+      "measurement_key_present": 468980,
+      "measurement_key_present_pct": 99.421676,
+      "measurement_key_missing": 2728,
       "measurement_explicit_null": 0,
       "measurement_non_object": 0,
       "measurement_object_present": 468980,
@@ -887,6 +953,7 @@
       "non_finite_values": 0,
       "candidate_sentinel_values": 0,
       "valid_numeric_values": 468980,
+      "measurement_types": {},
       "value_types": {
         "float": 464367,
         "int": 4613
@@ -917,8 +984,10 @@
       }
     },
     "pressure_pa": {
-      "records_total": 468980,
-      "measurement_key_missing": 0,
+      "records_total": 471708,
+      "measurement_key_present": 468980,
+      "measurement_key_present_pct": 99.421676,
+      "measurement_key_missing": 2728,
       "measurement_explicit_null": 0,
       "measurement_non_object": 0,
       "measurement_object_present": 468980,
@@ -929,6 +998,7 @@
       "non_finite_values": 0,
       "candidate_sentinel_values": 0,
       "valid_numeric_values": 468980,
+      "measurement_types": {},
       "value_types": {
         "float": 464367,
         "int": 4613
@@ -959,8 +1029,10 @@
       }
     },
     "pressure_thermocap1_k": {
-      "records_total": 468980,
-      "measurement_key_missing": 0,
+      "records_total": 471708,
+      "measurement_key_present": 468980,
+      "measurement_key_present_pct": 99.421676,
+      "measurement_key_missing": 2728,
       "measurement_explicit_null": 0,
       "measurement_non_object": 0,
       "measurement_object_present": 468980,
@@ -971,6 +1043,7 @@
       "non_finite_values": 0,
       "candidate_sentinel_values": 0,
       "valid_numeric_values": 468980,
+      "measurement_types": {},
       "value_types": {
         "float": 464009,
         "int": 4971
@@ -1001,8 +1074,10 @@
       }
     },
     "pressure_thermocap2_k": {
-      "records_total": 468980,
-      "measurement_key_missing": 0,
+      "records_total": 471708,
+      "measurement_key_present": 468980,
+      "measurement_key_present_pct": 99.421676,
+      "measurement_key_missing": 2728,
       "measurement_explicit_null": 0,
       "measurement_non_object": 0,
       "measurement_object_present": 468980,
@@ -1013,6 +1088,7 @@
       "non_finite_values": 0,
       "candidate_sentinel_values": 0,
       "valid_numeric_values": 468980,
+      "measurement_types": {},
       "value_types": {
         "float": 464679,
         "int": 4301
@@ -1043,8 +1119,10 @@
       }
     },
     "relative_humidity_humicap_a_pct": {
-      "records_total": 430016,
-      "measurement_key_missing": 0,
+      "records_total": 471708,
+      "measurement_key_present": 430016,
+      "measurement_key_present_pct": 91.161481,
+      "measurement_key_missing": 41692,
       "measurement_explicit_null": 0,
       "measurement_non_object": 0,
       "measurement_object_present": 430016,
@@ -1055,6 +1133,7 @@
       "non_finite_values": 0,
       "candidate_sentinel_values": 0,
       "valid_numeric_values": 430016,
+      "measurement_types": {},
       "value_types": {
         "float": 425851,
         "int": 4165
@@ -1085,8 +1164,10 @@
       }
     },
     "relative_humidity_humicap_b_pct": {
-      "records_total": 430016,
-      "measurement_key_missing": 0,
+      "records_total": 471708,
+      "measurement_key_present": 430016,
+      "measurement_key_present_pct": 91.161481,
+      "measurement_key_missing": 41692,
       "measurement_explicit_null": 0,
       "measurement_non_object": 0,
       "measurement_object_present": 430016,
@@ -1097,6 +1178,7 @@
       "non_finite_values": 0,
       "candidate_sentinel_values": 0,
       "valid_numeric_values": 430016,
+      "measurement_types": {},
       "value_types": {
         "float": 404262,
         "int": 25754
@@ -1127,8 +1209,10 @@
       }
     },
     "relative_humidity_pct": {
-      "records_total": 382249,
-      "measurement_key_missing": 0,
+      "records_total": 471708,
+      "measurement_key_present": 382249,
+      "measurement_key_present_pct": 81.03509,
+      "measurement_key_missing": 89459,
       "measurement_explicit_null": 0,
       "measurement_non_object": 0,
       "measurement_object_present": 382249,
@@ -1139,6 +1223,7 @@
       "non_finite_values": 0,
       "candidate_sentinel_values": 0,
       "valid_numeric_values": 382249,
+      "measurement_types": {},
       "value_types": {
         "float": 343779,
         "int": 38470
@@ -1170,6 +1255,8 @@
     },
     "rover_pitch_deg": {
       "records_total": 471708,
+      "measurement_key_present": 471708,
+      "measurement_key_present_pct": 100.0,
       "measurement_key_missing": 0,
       "measurement_explicit_null": 0,
       "measurement_non_object": 0,
@@ -1181,6 +1268,7 @@
       "non_finite_values": 0,
       "candidate_sentinel_values": 0,
       "valid_numeric_values": 471708,
+      "measurement_types": {},
       "value_types": {
         "float": 471698,
         "int": 10
@@ -1212,6 +1300,8 @@
     },
     "rover_position_x_m": {
       "records_total": 471708,
+      "measurement_key_present": 471708,
+      "measurement_key_present_pct": 100.0,
       "measurement_key_missing": 0,
       "measurement_explicit_null": 0,
       "measurement_non_object": 0,
@@ -1223,6 +1313,7 @@
       "non_finite_values": 0,
       "candidate_sentinel_values": 0,
       "valid_numeric_values": 471708,
+      "measurement_types": {},
       "value_types": {
         "float": 471705,
         "int": 3
@@ -1254,6 +1345,8 @@
     },
     "rover_position_y_m": {
       "records_total": 471708,
+      "measurement_key_present": 471708,
+      "measurement_key_present_pct": 100.0,
       "measurement_key_missing": 0,
       "measurement_explicit_null": 0,
       "measurement_non_object": 0,
@@ -1265,6 +1358,7 @@
       "non_finite_values": 0,
       "candidate_sentinel_values": 0,
       "valid_numeric_values": 471708,
+      "measurement_types": {},
       "value_types": {
         "float": 471705,
         "int": 3
@@ -1296,6 +1390,8 @@
     },
     "rover_position_z_m": {
       "records_total": 471708,
+      "measurement_key_present": 471708,
+      "measurement_key_present_pct": 100.0,
       "measurement_key_missing": 0,
       "measurement_explicit_null": 0,
       "measurement_non_object": 0,
@@ -1307,6 +1403,7 @@
       "non_finite_values": 0,
       "candidate_sentinel_values": 0,
       "valid_numeric_values": 471708,
+      "measurement_types": {},
       "value_types": {
         "float": 471707,
         "int": 1
@@ -1338,6 +1435,8 @@
     },
     "rover_roll_deg": {
       "records_total": 471708,
+      "measurement_key_present": 471708,
+      "measurement_key_present_pct": 100.0,
       "measurement_key_missing": 0,
       "measurement_explicit_null": 0,
       "measurement_non_object": 0,
@@ -1349,6 +1448,7 @@
       "non_finite_values": 0,
       "candidate_sentinel_values": 0,
       "valid_numeric_values": 471708,
+      "measurement_types": {},
       "value_types": {
         "float": 471700,
         "int": 8
@@ -1380,6 +1480,8 @@
     },
     "rover_velocity_m_s": {
       "records_total": 471708,
+      "measurement_key_present": 471708,
+      "measurement_key_present_pct": 100.0,
       "measurement_key_missing": 0,
       "measurement_explicit_null": 0,
       "measurement_non_object": 0,
@@ -1391,6 +1493,7 @@
       "non_finite_values": 0,
       "candidate_sentinel_values": 0,
       "valid_numeric_values": 471708,
+      "measurement_types": {},
       "value_types": {
         "int": 471140,
         "float": 568
@@ -1422,6 +1525,8 @@
     },
     "rover_yaw_deg": {
       "records_total": 471708,
+      "measurement_key_present": 471708,
+      "measurement_key_present_pct": 100.0,
       "measurement_key_missing": 0,
       "measurement_explicit_null": 0,
       "measurement_non_object": 0,
@@ -1433,6 +1538,7 @@
       "non_finite_values": 0,
       "candidate_sentinel_values": 0,
       "valid_numeric_values": 471708,
+      "measurement_types": {},
       "value_types": {
         "float": 471703,
         "int": 5
@@ -1464,6 +1570,8 @@
     },
     "solar_longitude_deg": {
       "records_total": 471708,
+      "measurement_key_present": 471708,
+      "measurement_key_present_pct": 100.0,
       "measurement_key_missing": 0,
       "measurement_explicit_null": 0,
       "measurement_non_object": 0,
@@ -1475,6 +1583,7 @@
       "non_finite_values": 0,
       "candidate_sentinel_values": 0,
       "valid_numeric_values": 471708,
+      "measurement_types": {},
       "value_types": {
         "float": 467025,
         "int": 4683
@@ -1506,6 +1615,8 @@
     },
     "solar_zenith_angle_deg": {
       "records_total": 471708,
+      "measurement_key_present": 471708,
+      "measurement_key_present_pct": 100.0,
       "measurement_key_missing": 0,
       "measurement_explicit_null": 0,
       "measurement_non_object": 0,
@@ -1517,6 +1628,7 @@
       "non_finite_values": 0,
       "candidate_sentinel_values": 0,
       "valid_numeric_values": 471708,
+      "measurement_types": {},
       "value_types": {
         "float": 467015,
         "int": 4693
@@ -1547,8 +1659,10 @@
       }
     },
     "upward_lw_irradiance_cal_w_m2": {
-      "records_total": 471471,
-      "measurement_key_missing": 0,
+      "records_total": 471708,
+      "measurement_key_present": 471471,
+      "measurement_key_present_pct": 99.949757,
+      "measurement_key_missing": 237,
       "measurement_explicit_null": 0,
       "measurement_non_object": 0,
       "measurement_object_present": 471471,
@@ -1559,6 +1673,7 @@
       "non_finite_values": 0,
       "candidate_sentinel_values": 0,
       "valid_numeric_values": 471471,
+      "measurement_types": {},
       "value_types": {
         "float": 466778,
         "int": 4693
@@ -1589,8 +1704,10 @@
       }
     },
     "upward_lw_irradiance_derived_w_m2": {
-      "records_total": 471471,
-      "measurement_key_missing": 0,
+      "records_total": 471708,
+      "measurement_key_present": 471471,
+      "measurement_key_present_pct": 99.949757,
+      "measurement_key_missing": 237,
       "measurement_explicit_null": 0,
       "measurement_non_object": 0,
       "measurement_object_present": 471471,
@@ -1601,6 +1718,7 @@
       "non_finite_values": 0,
       "candidate_sentinel_values": 0,
       "valid_numeric_values": 471471,
+      "measurement_types": {},
       "value_types": {
         "float": 466737,
         "int": 4734
@@ -1631,8 +1749,10 @@
       }
     },
     "upward_sw_irradiance_w_m2": {
-      "records_total": 471471,
-      "measurement_key_missing": 0,
+      "records_total": 471708,
+      "measurement_key_present": 471471,
+      "measurement_key_present_pct": 99.949757,
+      "measurement_key_missing": 237,
       "measurement_explicit_null": 0,
       "measurement_non_object": 0,
       "measurement_object_present": 471471,
@@ -1643,6 +1763,7 @@
       "non_finite_values": 0,
       "candidate_sentinel_values": 0,
       "valid_numeric_values": 471471,
+      "measurement_types": {},
       "value_types": {
         "float": 459613,
         "int": 11858
@@ -1673,8 +1794,10 @@
       }
     },
     "volume_mixing_ratio": {
-      "records_total": 90501,
-      "measurement_key_missing": 0,
+      "records_total": 471708,
+      "measurement_key_present": 90501,
+      "measurement_key_present_pct": 19.18581,
+      "measurement_key_missing": 381207,
       "measurement_explicit_null": 0,
       "measurement_non_object": 0,
       "measurement_object_present": 90501,
@@ -1685,6 +1808,7 @@
       "non_finite_values": 0,
       "candidate_sentinel_values": 0,
       "valid_numeric_values": 90501,
+      "measurement_types": {},
       "value_types": {
         "float": 89647,
         "int": 854
@@ -1713,8 +1837,10 @@
       }
     },
     "wind_direction_deg": {
-      "records_total": 361534,
-      "measurement_key_missing": 0,
+      "records_total": 471708,
+      "measurement_key_present": 361534,
+      "measurement_key_present_pct": 76.643602,
+      "measurement_key_missing": 110174,
       "measurement_explicit_null": 0,
       "measurement_non_object": 0,
       "measurement_object_present": 361534,
@@ -1725,6 +1851,7 @@
       "non_finite_values": 0,
       "candidate_sentinel_values": 9676,
       "valid_numeric_values": 351858,
+      "measurement_types": {},
       "value_types": {
         "float": 351039,
         "int": 10495
