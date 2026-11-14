@@ -322,11 +322,7 @@ def test_check_paths_resolves_symlinks_and_rejects_output_inside_input_dir(tmp_p
     f = tmp_path / "a.zip"
     f.write_text("x")
     link = tmp_path / "link.zip"
-
-    try:
-        link.symlink_to(f)
-    except OSError as exc:
-        pytest.skip(f"Symlink is unavailable on this Windows environment: {exc}")
+    link.symlink_to(f)
     with pytest.raises(archive.PathSafetyError):
         archive.check_paths(output=link, calibrated=f)
     d = tmp_path / "dir"
