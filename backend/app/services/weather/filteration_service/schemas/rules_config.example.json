@@ -1,0 +1,8 @@
+{
+  "config_version": "1",
+  "description": "Inert template. With these empty lists the run is identical to running without --rules. Every policy you add MUST cite its own authoritative evidence; see README section 'Rules configuration'.",
+  "disabled_rules": [],
+  "range_policies": [],
+  "flag_policies": [],
+  "source_selection": []
+}

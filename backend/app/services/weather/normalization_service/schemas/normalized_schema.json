@@ -1,0 +1,550 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "meda_weather/normalized_schema/v2.1",
+  "title": "MEDA Weather Normalizer v2.1 Canonical Record",
+  "description": "JSON Schema for one record of the Normalized JSONL dataset produced by meda_weather Normalizer v2.1. Each record represents one exact (Sol, SCLK) time point. Derived from the actual implementation in normalize.py, streaming.py, parser.py, and registry.py. SCLK is intentionally a string to preserve sub-millisecond precision that JSON numbers cannot represent without rounding.",
+  "type": "object",
+  "required": [
+    "sol",
+    "sclk_s",
+    "lmst",
+    "ltst",
+    "utc",
+    "measurements",
+    "quality",
+    "sources"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "sol": {
+      "description": "Mars Sol number, derived from the product file name.",
+      "type": "integer",
+      "minimum": 0
+    },
+    "sclk_s": {
+      "description": "Spacecraft Clock (SCLK) as a canonical decimal string. Never a JSON number. Format: no sign, no exponent, no leading zeros, no trailing fractional zeros. Example: '735849600' or '735849600.123'. Canonical rule: '100.0' and '100' both become '100'; '100.010' becomes '100.01'.",
+      "type": "string",
+      "pattern": "^(0|[1-9]\\d*)(\\.\\d*[1-9])?$"
+    },
+    "lmst": {
+      "description": "Local Mean Solar Time string, copied verbatim from the source CSV. Null when absent or empty in the source.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "ltst": {
+      "description": "Local True Solar Time string, copied verbatim from the source CSV. Null when absent or empty in the source.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "utc": {
+      "description": "UTC timestamp. Always null in Normalizer v2.1 output: UTC conversion requires SPICE SCLK+LSK kernels which are not available to the Normalizer.",
+      "type": "null"
+    },
+    "measurements": {
+      "description": "Dictionary of canonical measurement names to measurement objects. Canonical names are defined in normalize.py CHANNEL_SPECS. Keys that are absent were either missing from the source data or fell into raw_channels/unmapped_channels. The same physical variable from different processing levels (calibrated vs derived) always has distinct canonical names (e.g. 'downward_lw_irradiance_cal_w_m2' vs 'downward_lw_irradiance_derived_w_m2').",
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/measurement"
+      }
+    },
+    "quality": {
+      "description": "Dictionary of quality / flag column values keyed as '<PRODUCT>.<level>.<COLUMN>'. Values are preserved verbatim from the source CSV; no good/bad interpretation is applied. Keys include: uncertainty columns (any column containing 'UNCERTAINTY'), columns ending '_STABLE', and named flag columns (see FLAG_DEFINITIONS in normalize.py). Example key: 'WS.derived.ROVER_STILL'.",
+      "type": "object",
+      "additionalProperties": {
+        "type": [
+          "integer",
+          "number",
+          "string",
+          "null"
+        ]
+      }
+    },
+    "sources": {
+      "description": "List of provenance dicts for every contributing source row (one per CSV row that shared this exact Sol+SCLK). Never empty in a valid record.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/source_provenance"
+      }
+    },
+    "raw_channels": {
+      "description": "Full verbatim channel set for products whose entire channel set is preserved (RDS, ENG, ATS). Keyed as '<PRODUCT>.<level>'. Only present when at least one such product contributed to this record.",
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": {
+          "type": [
+            "integer",
+            "number",
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "raw_channel_issues": {
+      "description": "Validity flags for raw channel values that were not 'valid' (e.g. 'invalid_sentinel', 'unverified_sentinel_candidate'). Same key structure as raw_channels. Only present when at least one issue was detected.",
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "string"
+        }
+      }
+    },
+    "unmapped_channels": {
+      "description": "Columns from non-raw-channel products that were not mapped to any canonical name. Keyed as '<PRODUCT>.<level>'. Only present when unmapped columns exist.",
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": {
+          "type": [
+            "integer",
+            "number",
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "missing": {
+      "description": "Canonical measurement names that could not be built, with the reason. Reasons: 'empty_cell' (cell was None in source) or 'column_absent' (column not present in the CSV). Only contains measurements not present in the 'measurements' dict. Only present when at least one measurement was missing.",
+      "type": "object",
+      "additionalProperties": {
+        "type": "string",
+        "enum": [
+          "empty_cell",
+          "column_absent"
+        ]
+      }
+    },
+    "conflicts": {
+      "description": "List of conflict records where the same key appeared with differing content across contributing source rows. Kinds: 'duplicate_measurement', 'quality', 'time_metadata', 'raw_channels'. The first value encountered is kept in measurements/quality; the other is listed here. Only present when conflicts occurred.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/conflict_record"
+      }
+    },
+    "quarantined_channels": {
+      "description": "Measurement channels that were isolated by channel_policy (ChannelDecision action='exclude'). These values are not in measurements. Only present when quarantine was applied.",
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": [
+          "source_channel",
+          "raw_value",
+          "reason",
+          "channel_status"
+        ],
+        "properties": {
+          "source_channel": {
+            "type": "string"
+          },
+          "raw_value": {
+            "type": [
+              "integer",
+              "number",
+              "string",
+              "null"
+            ]
+          },
+          "reason": {
+            "type": "string"
+          },
+          "channel_status": {
+            "type": "string"
+          },
+          "source_file": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "source_row": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "measurement": {
+      "description": "One normalized measurement value with full provenance. The 'value' field is null when validity is 'invalid_sentinel' or 'non_numeric'; it is kept as given when validity is 'valid' or 'unverified_sentinel_candidate'.",
+      "type": "object",
+      "required": [
+        "value",
+        "unit",
+        "source_unit",
+        "unit_basis",
+        "validity",
+        "source_product",
+        "source_level",
+        "source_file",
+        "source_row",
+        "source_channel"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "description": "Numeric measurement value or null. Null when validity is 'invalid_sentinel' or 'non_numeric'. Zero is a valid value and is never treated as missing.",
+          "type": [
+            "number",
+            "integer",
+            "null"
+          ]
+        },
+        "unit": {
+          "description": "Short unit symbol (e.g. 'Pa', 'K', 'm/s', 'W/m2', 'ppm', 'deg'). Null when the XML label states no unit and the unit is unverified (e.g. relative humidity channels). See also unit_verified.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_unit": {
+          "description": "Unit string exactly as found in the PDS4 XML label (e.g. 'pascal', 'kelvin'). Null when the label states no unit.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "unit_basis": {
+          "description": "Evidence basis for the unit. 'label' = unit verified against the XML label. 'bundle_description' = from bundle description (not used by v2.1). 'not_stated' = label has no <unit> element.",
+          "type": "string",
+          "enum": [
+            "label",
+            "bundle_description",
+            "not_stated"
+          ]
+        },
+        "validity": {
+          "description": "Classification of this measurement value. 'valid' = numeric value, not a sentinel. 'invalid_sentinel' = value matched a VERIFIED sentinel rule (value->null, raw_value preserved). 'unverified_sentinel_candidate' = value matches an UNVERIFIED sentinel rule (value kept, raw_value repeated, warning counted). 'non_numeric' = text found in a numeric channel.",
+          "type": "string",
+          "enum": [
+            "valid",
+            "invalid_sentinel",
+            "unverified_sentinel_candidate",
+            "non_numeric"
+          ]
+        },
+        "source_product": {
+          "description": "MEDA product type code (e.g. 'PS', 'WS', 'RHS', 'TIRS', 'ANC', 'ATS').",
+          "type": "string"
+        },
+        "source_level": {
+          "description": "Processing level of the source CSV. 'calibrated' or 'derived'.",
+          "type": "string",
+          "enum": [
+            "calibrated",
+            "derived"
+          ]
+        },
+        "source_file": {
+          "description": "Source CSV file name (without directory path).",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_row": {
+          "description": "Physical CSV line number (1-based, header = line 1). Null when line tracking is unavailable.",
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "source_channel": {
+          "description": "Original CSV column name that produced this measurement (e.g. 'PRESSURE', 'HORIZONTAL_WIND_SPEED').",
+          "type": "string"
+        },
+        "unit_verified": {
+          "description": "Present and false only when unit is null and unit_basis is 'not_stated'. Absent for measurements whose unit is verified from the label.",
+          "type": "boolean",
+          "const": false
+        },
+        "raw_value": {
+          "description": "Original value before sentinel substitution (number), or the offending text for non_numeric. Present only when validity is not 'valid'.",
+          "type": [
+            "number",
+            "integer",
+            "string",
+            "null"
+          ]
+        },
+        "validity_reason": {
+          "description": "Human-readable explanation of why validity is not 'valid'. Only present when validity is NOT 'valid'.",
+          "type": "string"
+        },
+        "uncertainty": {
+          "description": "Measurement uncertainty (1-sigma). Only present when the ChannelSpec declares an uncertainty column and the source CSV contains a non-null value for it.",
+          "$ref": "#/$defs/uncertainty"
+        }
+      },
+      "allOf": [
+        {
+          "description": "normalize._build_measurement: value is nulled only for invalid_sentinel / non_numeric; otherwise the numeric value is kept.",
+          "if": {
+            "properties": {
+              "validity": {
+                "enum": [
+                  "invalid_sentinel",
+                  "non_numeric"
+                ]
+              }
+            },
+            "required": [
+              "validity"
+            ]
+          },
+          "then": {
+            "properties": {
+              "value": {
+                "type": "null"
+              }
+            }
+          },
+          "else": {
+            "properties": {
+              "value": {
+                "type": [
+                  "number",
+                  "integer"
+                ]
+              }
+            }
+          }
+        },
+        {
+          "description": "normalize._build_measurement: raw_value and validity_reason are written whenever validity is not 'valid'.",
+          "if": {
+            "properties": {
+              "validity": {
+                "enum": [
+                  "invalid_sentinel",
+                  "unverified_sentinel_candidate",
+                  "non_numeric"
+                ]
+              }
+            },
+            "required": [
+              "validity"
+            ]
+          },
+          "then": {
+            "required": [
+              "raw_value",
+              "validity_reason"
+            ]
+          }
+        },
+        {
+          "description": "normalize._build_measurement: unit_verified=false is written exactly when ChannelSpec.unit is None.",
+          "if": {
+            "properties": {
+              "unit": {
+                "type": "null"
+              }
+            },
+            "required": [
+              "unit"
+            ]
+          },
+          "then": {
+            "required": [
+              "unit_verified"
+            ]
+          }
+        }
+      ]
+    },
+    "uncertainty": {
+      "description": "Uncertainty (1-sigma) associated with a measurement.",
+      "type": "object",
+      "required": [
+        "value",
+        "unit",
+        "source_channel",
+        "validity"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "value": {
+          "description": "Numeric uncertainty value or null (null when validity is not 'valid').",
+          "type": [
+            "number",
+            "integer",
+            "null"
+          ]
+        },
+        "unit": {
+          "description": "Unit symbol for the uncertainty value. May be null if the label states no unit.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_channel": {
+          "description": "CSV column name containing the uncertainty value.",
+          "type": "string"
+        },
+        "validity": {
+          "description": "Validity of the uncertainty value using the same vocabulary as measurement.validity.",
+          "type": "string",
+          "enum": [
+            "valid",
+            "invalid_sentinel",
+            "unverified_sentinel_candidate",
+            "non_numeric"
+          ]
+        },
+        "raw_value": {
+          "description": "Original uncertainty value (number, or text when non_numeric). Present only when uncertainty validity is not 'valid'.",
+          "type": [
+            "number",
+            "integer",
+            "string",
+            "null"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "validity": {
+                "enum": [
+                  "invalid_sentinel",
+                  "unverified_sentinel_candidate",
+                  "non_numeric"
+                ]
+              }
+            },
+            "required": [
+              "validity"
+            ]
+          },
+          "then": {
+            "required": [
+              "raw_value"
+            ]
+          }
+        }
+      ]
+    },
+    "source_provenance": {
+      "description": "Provenance of one contributing CSV row.",
+      "type": "object",
+      "required": [
+        "source_level",
+        "product",
+        "source_file"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "source_level": {
+          "type": "string",
+          "enum": [
+            "calibrated",
+            "derived"
+          ]
+        },
+        "product": {
+          "description": "MEDA product type code.",
+          "type": "string"
+        },
+        "source_file": {
+          "type": "string"
+        },
+        "source_row": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "release": {
+          "description": "Numeric release number extracted from the file name (e.g. 'P02' -> 2). Null when not determinable.",
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "original_sclk": {
+          "description": "SCLK text exactly as found in the CSV, before canonical normalization.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "source_archive": {
+          "description": "Source archive identifier. Present only when archive provenance is recorded.",
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "conflict_record": {
+      "description": "One conflict entry. normalize.normalize_group writes 'key' for kinds duplicate_measurement / quality / raw_channels and 'field' (not 'key') for kind time_metadata. Remaining members (kept, other, other_source) vary by kind and are open.",
+      "type": "object",
+      "required": [
+        "kind"
+      ],
+      "additionalProperties": true,
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "duplicate_measurement",
+            "quality",
+            "time_metadata",
+            "raw_channels"
+          ]
+        },
+        "key": {
+          "description": "Canonical measurement name, quality key, or '<PRODUCT>.<level>' key.",
+          "type": "string"
+        },
+        "field": {
+          "description": "Time field name ('lmst' or 'ltst'); time_metadata conflicts only.",
+          "type": "string",
+          "enum": [
+            "lmst",
+            "ltst"
+          ]
+        }
+      },
+      "allOf": [
+        {
+          "if": {
+            "properties": {
+              "kind": {
+                "const": "time_metadata"
+              }
+            },
+            "required": [
+              "kind"
+            ]
+          },
+          "then": {
+            "required": [
+              "field"
+            ]
+          },
+          "else": {
+            "required": [
+              "key"
+            ]
+          }
+        }
+      ]
+    }
+  },
+  "$comment": "Contract notes derived from the v2.1 source. (1) The normalize.py module docstring does not list 'quarantined_channels' or 'unit_verified' although the code emits both; the code is authoritative. (2) unit_basis 'bundle_description' is allowed by ChannelSpec's documented vocabulary but no v2.1 channel uses it. (3) PS.derived PRESSURE_UNCERTAINTY: the label gives 'kelvin'; the Normalizer leaves the uncertainty unit null. (4) 'sources' entries may carry extra keys; only the keys the parser/streaming code writes are described. (5) Records are written in strictly increasing (sol, SCLK) order (streaming.validate_jsonl); this is not expressible per-record."
+}

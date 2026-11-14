@@ -1,0 +1,943 @@
+تمام، ده التقرير كامل بصيغة **Markdown**. انسخه واحفظه باسم:
+
+`MWI_MEDA_Weather_Pipeline_Report.md`
+
+````
+# MarsWalk Intelligence — MEDA Weather Pipeline
+## التقرير المعماري وخطة التنفيذ من Normalization إلى Frontend
+
+**Project:** MarsWalk Intelligence (MWI)  
+**Module:** MEDA Weather  
+**Date:** 14 November 2026
+
+---
+
+# 1. Project Overview
+
+## 1.1 الهدف النهائي
+
+الهدف من MEDA Weather Pipeline هو تحويل بيانات الطقس الأصلية القادمة من NASA MEDA إلى بيانات منظمة ومجهزة علميًا، يمكن الاعتماد عليها في الحسابات والتحليلات داخل MarsWalk Intelligence.
+
+المخرجات النهائية ستخدم ثلاثة مستهلكين رئيسيين:
+
+1. **Cost Function → Grid → Weights:** توفير القيم الجوية المناسبة لكل Grid Cell لحساب تأثير الطقس على تكلفة الحركة، ثم استخدام النتائج في Route Planning.
+2. **Consumables:** توفير المعلومات الجوية اللازمة لتقدير تأثير الظروف البيئية على استهلاك موارد المهمة.
+3. **Route Weather Summary:** تحليل الظروف الجوية على المسار الذي اختاره المستخدم، وإظهار ملخص خاص بهذا المسار في Frontend.
+
+المراحل العلمية الأساسية:
+
+1. Normalization
+2. Filtering
+3. Aggregation
+
+تنتهي مرحلة التجهيز العلمي عند Aggregation. بعد ذلك تستهلك الوحدات المختلفة مخرجاتها حسب احتياج كل وحدة، بينما يتولى Backend توفير النتائج المطلوبة للـ Frontend من خلال API.
+
+> **Architecture Note:** ليس من المفترض أن يكون هناك ملف Aggregation واحد متطابق يُستخدم كما هو في كل المستهلكين. يجب تصميم مخرجات Aggregation بما يتناسب مع احتياجات Cost Function وConsumables وRoute Weather Summary.
+
+---
+
+# 2. Overall Architecture
+
+```text
+NASA MEDA Products
+        |
+        v
+1. NORMALIZATION
+        |
+        | Normalized Dataset
+        v
+2. FILTERING
+        |
+        | Filtered Dataset + Filtering Report
+        v
+3. AGGREGATION
+        |
+        | Aggregation Outputs
+        |
+        +--------------------+---------------------+
+        |                    |                     |
+        v                    v                     v
+ Cost Function          Consumables         Route Weather
+        |                    |               Summary Logic
+        v                    v                     |
+ Grid / Weights        Resource Impact             |
+        |                    |                     |
+        +--------------------+---------------------+
+                             |
+                             v
+                    Backend Weather API
+                             |
+                             v
+                          Frontend
+````
+
+التواصل بين مراحل الـ Pipeline العلمية يتم عن طريق ملفات محلية وData Contracts واضحة، وليس عن طريق API بين كل Package والثانية.
+
+وجود Packages منفصلة لا يعني بالضرورة أننا نحتاج HTTP API بينها، طالما أنها تعمل ضمن بيئة Pipeline واحدة ويمكنها قراءة وكتابة الملفات المتفق عليها.
+
+# **PART 1 — SCIENTIFIC DATA PREPARATION**
+
+# **3. Stage 1 — Normalization**
+
+**Status:** Normalizer Package v2.1 تم العمل عليه.
+
+## **3.1 Data Sources**
+
+يتعامل الـ Normalizer مع منتجات MEDA، ومنها:
+
+- Calibrated Products
+- Derived Products
+
+تحتوي المنتجات على ملفات بيانات مثل CSV، بالإضافة إلى ملفات Labels/Metadata مثل XML التي تساعد في تفسير أسماء القنوات ووحدات القياس ومعلومات المنتج.
+
+أسماء المنتجات والقنوات ليست بالضرورة موحدة بين جميع الملفات؛ لذلك لا يصح افتراض أن كل CSV له نفس الأعمدة أو نفس المعنى دون الرجوع إلى معلومات المنتج.
+
+## **3.2 Normalizer Responsibilities**
+
+يقوم الـ Normalizer بتحويل مصادر MEDA المختلفة إلى تمثيل موحد Canonical Representation.
+
+المهام الأساسية:
+
+1. اكتشاف ملفات المنتجات.
+2. قراءة ملفات البيانات والـ Labels المرتبطة بها.
+3. استخراج القياسات والـ Metadata.
+4. ربط أسماء القنوات الأصلية بأسماء Canonical موحدة.
+5. التعامل مع وحدات القياس وفق معلومات المصدر.
+6. الاحتفاظ بمعلومات المصدر Provenance.
+7. تجميع القياسات التي تنتمي إلى نفس مفتاح القراءة في Record موحد.
+
+## **3.3 Reading Identity — Sol and SCLK**
+
+يعتمد تكوين الـ Record على المطابقة الدقيقة لمفتاح:
+
+```
+(Sol, SCLK)
+```
+
+أي أن القراءات لا تُجمع لمجرد أنها تنتمي إلى نفس Sol؛ بل يجب أن تتطابق قيمتا Sol وSCLK وفق قواعد الـ Normalizer.
+
+يجب عدم تقريب SCLK أو دمج قراءات ذات أزمنة مختلفة لمجرد تقاربها.
+
+كذلك يجب الحفاظ على دقة SCLK. وعندما يكون ممثلًا كسلسلة Decimal String، فلا ينبغي تحويله إلى Floating Point بما قد يؤدي إلى فقدان الدقة.
+
+ولا يتم اختراع UTC أو تخمينه إذا لم تتوفر معلومات كافية لتحويل الوقت بصورة موثوقة.
+
+## **3.4 Normalized Dataset**
+
+الناتج الأساسي هو:
+
+```
+Normalized Dataset
+```
+
+ويحتوي على Records موحدة مع الاحتفاظ بالمعلومات اللازمة لفهم مصدر كل قياس وجودته.
+
+هذا الناتج هو المدخل المباشر لمرحلة Filtering.
+
+## **3.5 What Normalization Does NOT Do**
+
+- لا يقرر أن القياس صالح علميًا لمجرد نجاح قراءته.
+- لا يحذف القياسات لمجرد أنها غير مألوفة أو متطرفة.
+- لا يملأ القيم المفقودة بقيم مخترعة.
+- لا يستبدل Filtering أو Aggregation.
+- لا يضمن وحده أن كل قياس مناسب للاستخدام في كل Consumer.
+
+**الفكرة:** Normalization يوحّد شكل البيانات ويحافظ على معناها ومصدرها؛ أما قرار قبول القياس للاستخدام فيأتي في مرحلة Filtering.
+
+# **4. Normalized Dataset Contract**
+
+يجب أن يكون هناك Contract واضح يصف شكل الـ Normalized Dataset الفعلي الناتج من Normalizer v2.1.
+
+الملفات المقترحة ضمن حزمة Filtering:
+
+```
+normalized_schema.json
+normalized_schema_validator.py
+```
+
+## **4.1 normalized_schema.json**
+
+مسؤوليته:
+
+- وصف بنية الـ Normalized Record.
+- تحديد الحقول المطلوبة والاختيارية.
+- توضيح أنواع البيانات.
+- توثيق شكل القياسات والـ Metadata والـ Provenance.
+- توثيق القيم المسموح بها عندما تكون محددة فعليًا في عقد المصدر.
+
+## **4.2 normalized_schema_validator.py**
+
+مسؤوليته:
+
+- فحص أن الملف الناتج من Normalizer يطابق العقد.
+- اكتشاف الحقول المفقودة أو أنواع البيانات غير الصحيحة.
+- الإبلاغ عن السجلات غير المطابقة.
+- عدم تعديل البيانات أو إصلاحها أو تصفيتها.
+
+الـ Schema يصف شكل البيانات، والـ Validator يفحص مدى مطابقة البيانات لهذا الشكل.
+
+لا يقوم أي منهما بعملية Filtering.
+
+# **5. Stage 2 — Filtering**
+
+**Status:** مرحلة التصميم والتنفيذ التالية للـ Normalization.
+
+## **5.1 Objective**
+
+الـ Filtering يحدد حالة كل Measurement داخل الـ Normalized Dataset:
+
+- هل يمكن قبولها للاستخدام في المراحل التالية؟
+- هل يجب رفضها؟
+- هل تحتاج إلى مراجعة بسبب عدم كفاية الأدلة؟
+
+الفلترة يجب أن تكون على مستوى القياس Measurement-Level، وليس بالضرورة على مستوى الـ Record بالكامل.
+
+مثال:
+
+قد يحتوي Record واحد على قياس حرارة صالح وقياس آخر غير صالح. لا ينبغي حذف الـ Record بالكامل تلقائيًا إذا كان من الممكن الاحتفاظ بالقياس الصالح واستبعاد القياس غير الصالح فقط.
+
+## **5.2 Measurement Decisions**
+
+الحالات الأساسية:
+
+| Status            | Meaning                                                     |
+| ----------------- | ----------------------------------------------------------- |
+| `accepted`        | القياس اجتاز القواعد المفعلة ويمكن تمريره إلى Aggregation   |
+| `rejected`        | توجد قاعدة موثقة ومطبقة تثبت عدم قبول القياس                |
+| `review_required` | الأدلة أو المعلومات المتاحة غير كافية لاتخاذ قرار آلي موثوق |
+
+لا ينبغي تحويل `review_required` تلقائيًا إلى `rejected` أو `accepted` دون قاعدة واضحة.
+
+## **5.3 Filtering Rules Principles**
+
+يجب أن تكون القواعد:
+
+1. **Evidence-based:** مستندة إلى مصدر موثوق أو توثيق علمي مناسب.
+2. **Measurement-specific:** مرتبطة بنوع القياس ووحدته وسياقه.
+3. **Traceable:** يمكن معرفة القاعدة التي أدت إلى القرار.
+4. **Configurable:** يمكن تفعيل القواعد أو تعطيلها أو تعديل إعداداتها بطريقة موثقة.
+5. **Conservative:** عند عدم وجود دليل كافٍ، لا يتم اختراع Threshold أو افتراض أن القيمة غير صالحة.
+
+## **5.4 Rules and Restrictions**
+
+يجب تجنب الآتي:
+
+- عدم رفض القيم لمجرد أنها Extreme.
+- عدم افتراض أن كل Sentinel Value له نفس المعنى في جميع المنتجات والقنوات.
+- عدم افتراض أن كل Quality Flag يعمل بالطريقة نفسها دون الرجوع إلى تعريفه.
+- عدم اعتبار Calibrated وDerived مصادر قابلة للاستبدال تلقائيًا.
+- عدم اختراع حدود فيزيائية أو إحصائية دون سند.
+- عدم إجراء Interpolation أو تعويض القيم المفقودة.
+- عدم تغيير Timestamp أو إصلاح البيانات بصمت.
+- عدم حذف Record كامل بسبب مشكلة في Measurement واحدة إذا كان بالإمكان تقييم القياسات بشكل مستقل.
+
+## **5.5 Source Selection**
+
+عندما يتوفر قياس من Calibrated Product وآخر من Derived Product، يجب أن يكون اختيار المصدر واضحًا وقابلًا للتوثيق والإعداد.
+
+لا نفترض أنهما متطابقان أو قابلان للاستبدال دون دراسة معنى كل منتج وطريقة اشتقاقه.
+
+## **5.6 Filtering Outputs**
+
+المخرجات الأساسية:
+
+```
+meda_filtered.jsonl
+```
+
+ويحتوي على القياسات المقبولة وفق قواعد الفلترة المفعلة، مع الحفاظ على بنية البيانات الأصلية اللازمة للمراحل التالية، وإضافة أقل قدر ضروري من Metadata الخاصة بقرار الفلترة.
+
+كذلك يتم إنتاج Filtering Report يحتوي على:
+
+- إجمالي عدد القياسات التي تم فحصها.
+- عدد القياسات المقبولة.
+- عدد القياسات المرفوضة.
+- عدد القياسات التي تحتاج إلى مراجعة.
+- أسباب الرفض أو المراجعة.
+- القواعد التي تم تطبيقها.
+- القواعد غير المفعلة أو التي تنتظر أدلة.
+- إحصاءات حسب Measurement أو Product أو سبب القرار، عندما تكون هذه الإحصاءات مدعومة بالبيانات.
+
+## **5.7 Filtered Dataset Contract**
+
+الملف المقترح:
+
+```
+filtered_schema.py
+```
+
+يكون تعريفًا خالصًا لبنية Filtered Dataset، دون وضع منطق الفلترة أو تشغيل الخدمات داخله.
+
+Validator مستقل:
+
+```
+filtered_schema_validator.py
+```
+
+مسؤوليته فحص أن ناتج Filtering يطابق العقد، وليس إجراء Filtering أو إصلاح البيانات.
+
+## **5.8 Why Do We Need Filtered Schema?**
+
+لأن Aggregation يجب أن يعرف شكل البيانات التي يستقبلها بصورة ثابتة.
+
+وجود Contract يمنع اختلاف التوقعات بين Filtering وAggregation، ويسهّل اكتشاف أي تغيير غير متوافق في بنية البيانات.
+
+# **6. Stage 3 — Aggregation**
+
+**Status:** المرحلة التالية بعد استقرار Filtering وعقد البيانات الخاص به.
+
+## **6.1 Objective**
+
+تحويل القياسات المقبولة إلى مخرجات علمية قابلة للاستخدام في الحسابات المختلفة داخل MWI.
+
+Filtering يقرر ما إذا كان القياس مقبولًا، بينما Aggregation ينظم القياسات المقبولة ويستخرج منها تمثيلات وإحصاءات مناسبة للمستهلكين.
+
+## **6.2 Inputs**
+
+- Filtered Dataset.
+- Filtered Schema/Contract.
+- إعدادات التجميع الموثقة.
+- Metadata اللازمة لفهم Sol وSCLK والمصدر والوحدات.
+- أي بيانات مكانية أو زمنية لازمة للتجميع، بشرط أن تكون متوفرة ومحددة في مصادر المشروع.
+
+## **6.3 Aggregation Design Requirements**
+
+لا ينبغي البدء بكتابة Aggregation قبل تحديد احتياجات المستهلكين، لأن طريقة التجميع تعتمد على السؤال الذي سيستخدم الناتج للإجابة عنه.
+
+يجب حسم النقاط التالية:
+
+1. **Spatial Aggregation:** كيف سيتم ربط القياسات بالموقع أو الـ Grid Cell؟ وما دقة الإسناد المكاني المتاحة؟
+2. **Temporal Aggregation:** ما الفترات الزمنية المطلوبة؟ وكيف سيتم التعامل مع اختلاف كثافة القياسات؟
+3. **Measurement Aggregation:** ما الإحصاءات المناسبة لكل Measurement؟
+4. **Missing Data:** كيف يتم تمثيل عدم وجود بيانات؟ يجب ألا يتحول غياب البيانات إلى قيمة صفرية أو قيمة مفترضة.
+5. **Source Consistency:** كيف يتم التعامل مع اختلاف Product أو نوع المصدر؟
+6. **Uncertainty and Quality:** ما معلومات الجودة أو عدم اليقين التي يجب الاحتفاظ بها مع القيمة المجمعة؟
+7. **Units:** يجب أن تكون الوحدات واضحة ومتسقة، وألا تتم مقارنة قيم بوحدات مختلفة دون تحويل موثق.
+
+## **6.4 Possible Statistical Outputs**
+
+حسب طبيعة كل Measurement واحتياج المستهلك، قد تشمل المخرجات:
+
+- Mean
+- Min
+- Max
+- Count
+- Standard Deviation أو مؤشرات تشتت مناسبة
+- Coverage / Data Availability
+- مؤشرات الجودة أو عدم اليقين إذا كانت متاحة ومحددة
+
+هذه قائمة مرشحة وليست قرارًا بأن كل الإحصاءات يجب أن تُحسب لكل Measurement. يجب اختيارها حسب المعنى العلمي وطريقة استخدامها.
+
+## **6.5 Aggregation Is Not Cost Calculation**
+
+Aggregation لا يحسب تكلفة الحركة ولا يحدد الـ Weights النهائية.
+
+هو يجهز القيم والإحصاءات الجوية التي يمكن للـ Cost Function استخدامها لاحقًا.
+
+وبالمثل، لا ينبغي أن يحسب Aggregation استهلاك الموارد النهائي لمجرد أن Consumables سيستخدم بياناته.
+
+## **6.6 Aggregation Outputs**
+
+قد تكون المخرجات في صورة Dataset أو أكثر من Output Contract، وفق التصميم النهائي.
+
+المبدأ هو أن تكون المخرجات كافية لتغطية احتياجات:
+
+- Cost Function.
+- Consumables.
+- Route Weather Summary.
+
+لا يتم تثبيت أسماء الملفات أو تفاصيل الحقول أو دقة الـ Grid قبل الانتهاء من تحليل احتياجات كل Consumer.
+
+## **6.7 Aggregation Schema**
+
+بعد الاتفاق على شكل المخرجات، يتم تعريف Contract لها. قد يكون Schema واحدًا أو أكثر من Schema متخصص، حسب اختلاف أشكال المخرجات.
+
+ويجب أن يوضح:
+
+- بنية البيانات.
+- مفاتيح الربط المكانية والزمنية.
+- Measurement names.
+- Units.
+- Statistics.
+- Counts وCoverage.
+- Quality/Uncertainty metadata المتاحة.
+- طريقة تمثيل القيم المفقودة.
+
+لا نضع شكلًا افتراضيًا قبل تحديد الـ Outputs الفعلية.
+
+# **PART 2 — DOWNSTREAM CONSUMERS**
+
+# **7. Consumer 1 — Cost Function → Grid → Weights**
+
+## **7.1 Objective**
+
+استخدام بيانات MEDA المجهزة لتقدير تأثير ظروف الطقس على تكلفة الحركة في كل Grid Cell.
+
+## **7.2 Workflow**
+
+```
+Aggregation Outputs
+        |
+        v
+Weather Values for Grid Cells
+        |
+        v
+Cost Function
+        |
+        v
+Grid Cell Cost
+        |
+        v
+Weights
+        |
+        v
+Route / Path Planning
+```
+
+## **7.3 Responsibilities**
+
+- **Aggregation:** يوفر البيانات الجوية المجمعة.
+- **Grid Mapping/Association:** يربط البيانات بالموقع أو الخلايا وفق النظام المكاني المعتمد.
+- **Cost Function:** يحول العوامل الجوية ذات الصلة إلى مساهمة في تكلفة الحركة وفق النموذج المعتمد.
+- **Weights:** تستخدمها خوارزمية التخطيط لحساب المسار.
+
+## **7.4 Requirements Before Implementation**
+
+- ما القياسات الجوية التي تؤثر فعلًا في تكلفة الحركة؟
+- ما العلاقة الرياضية بين كل Measurement والتكلفة؟
+- هل التأثير يختلف حسب نوع التضاريس أو ظروف المهمة؟
+- كيف يتم التعامل مع خلية لا تتوفر لها بيانات؟
+- كيف يتم توحيد النطاقات والوحدات؟
+- ما مصدر الـ Weights النهائي وكيف يتم دمجه مع بقية مكونات التكلفة؟
+
+**Important:** لا يجوز اعتبار Mean أو Max أو أي قيمة إحصائية تكلفة جاهزة. تحويل القياس إلى Cost مسؤولية Cost Function، وليس Aggregation.
+
+# **8. Consumer 2 — Consumables**
+
+## **8.1 Objective**
+
+توفير معلومات الطقس التي تساعد وحدة Consumables على تقدير تأثير الظروف الجوية على موارد المهمة.
+
+## **8.2 Workflow**
+
+```
+Aggregation Outputs
+        |
+        v
+Weather Inputs
+        |
+        v
+Consumables Logic
+        |
+        v
+Resource Consumption Estimate
+        |
+        v
+Backend / Mission Response
+```
+
+## **8.3 Requirements**
+
+- ما الموارد التي تتأثر بالطقس؟
+- ما المتغيرات الجوية التي تدخل في كل نموذج؟
+- ما الفترة الزمنية المناسبة للحساب؟
+- ما الافتراضات الخاصة بالمهمة؟
+- كيف يتم تمثيل عدم توفر بيانات جوية؟
+- كيف يتم إظهار الافتراضات وعدم اليقين للمستخدم؟
+
+Aggregation يوفر المدخلات الجوية، أما معادلات الاستهلاك والافتراضات الخاصة بالمهمة فتظل ضمن مسؤولية Consumables.
+
+# **9. Consumer 3 — Route Weather Summary**
+
+## **9.1 Objective**
+
+إنتاج ملخص جوي خاص بالمسار الذي اختاره المستخدم.
+
+المطلوب ليس عرض متوسط الطقس العام للمريخ، ولا إنشاء Summary منفصل لكل Sol في الواجهة؛ المطلوب هو تحليل ظروف الطقس المرتبطة بالمسار المحدد.
+
+## **9.2 Workflow**
+
+```
+Selected Route
+      |
+      v
+Route Spatial / Temporal Context
+      |
+      v
+Relevant Aggregation Data
+      |
+      v
+Route Weather Analysis
+      |
+      v
+Weather Summary Response
+      |
+      v
+Frontend
+```
+
+يجب أن يعتمد التحليل على سياق المسار، مثل موقعه وامتداده، وأي معلومات زمنية متاحة ومطلوبة في نموذج التحليل.
+
+لا يتم افتراض طريقة أخذ عينات أو دقة مكانية أو زمنية قبل تحديدها في تصميم Route Weather Analysis.
+
+## **9.3 Route-Specific Summary**
+
+كل Route قد يكون له Weather Summary مختلف.
+
+عندما يختار المستخدم Route آخر، يجب أن تعرض الواجهة ملخص هذا المسار، وليس ملخصًا عامًا أو نتيجة مسار سابق.
+
+# **PART 3 — BACKEND API & FRONTEND**
+
+# **10. Backend Weather API**
+
+**Status:** تصميم متفق عليه مبدئيًا، وليس Endpoint موجودًا بالفعل حسب آخر مراجعة للمصدر.
+
+## **10.1 Proposed File Structure**
+
+```
+backend/
+└── app/
+    ├── api/
+    │   └── weather.py
+    │
+    └── schemas/
+        └── weather_summary.py
+```
+
+`weather.py` داخل `api` مسؤول عن Endpoints الخاصة بالطقس.
+
+أما `weather_summary.py` داخل `schemas` فيحتوي على Pydantic Models التي تحدد شكل الـ Request/Response المتعلق بملخص الطقس.
+
+## **10.2 Endpoint 1 — Analyze**
+
+```
+POST /api/v1/weather/analyze
+```
+
+**Purpose:** بدء تحليل الطقس للمسار المحدد.
+
+يستقبل الطلب معلومات كافية لتحديد المسار وسياق التحليل، مثل Route ID أو Route Context وفق تصميم Backend النهائي.
+
+بعدها:
+
+1. التحقق من صحة الطلب.
+2. تحديد المسار.
+3. الحصول على بيانات Aggregation اللازمة.
+4. تنفيذ Route Weather Analysis.
+5. إنشاء Weather Summary.
+6. إرجاع النتيجة أو حفظها بحيث يمكن استرجاعها لاحقًا.
+
+تفاصيل التخزين والـ Caching لم يتم حسمها بعد.
+
+## **10.3 Endpoint 2 — Get Summary**
+
+```
+GET /api/v1/weather/summary
+```
+
+**Purpose:** استرجاع Summary سبق إنشاؤه للمسار المحدد.
+
+هذا Endpoint للاسترجاع، وليس لإعادة تشغيل التحليل في كل مرة.
+
+يجب أن يتحدد المسار المطلوب من خلال Route ID أو آلية تعريف واضحة ضمن تصميم الـ API.
+
+## **10.4 Response Schema**
+
+الـ Endpointان يعيدان نفس نوع الاستجابة المنطقي:
+
+```
+WeatherSummaryResponse
+```
+
+ويمكن تعريفه داخل:
+
+```
+backend/app/schemas/weather_summary.py
+```
+
+الحقول النهائية لم يتم تثبيتها بعد. يجب أن تتحدد بعد الانتهاء من تصميم Route Weather Analysis واحتياجات الواجهة.
+
+من المعلومات التي يجب تقييم الحاجة إليها:
+
+- Route identifier.
+- معلومات مختصرة عن المسار.
+- فترة أو سياق التحليل.
+- ملخص القياسات الجوية.
+- Units.
+- مؤشرات Data Coverage.
+- Quality أو Uncertainty indicators عند توفرها.
+- وقت إنشاء التحليل `generated_at`.
+- أي تحذيرات أو قيود على تفسير النتيجة.
+
+لا ينبغي إضافة حقول أو قيم غير موجودة في مصدر البيانات أو غير محسوبة فعليًا.
+
+## **10.5 Existing Backend Notes**
+
+خلال المراجعة السابقة للمشروع على Branch `AASH_WS` تم رصد Schemas خاصة بـ Route وMission، بالإضافة إلى API للـ Navigation وConsumables وScience.
+
+كما تم رصد أن Weather Router لم يكن مسجلًا في `main.py` وقت تلك المراجعة.
+
+وكان الملف:
+
+```
+backend/app/schemas/weather.py
+```
+
+يحتوي على تعريف Canonical MEDA Weather Schema مكررًا بالنسبة لاحتياج Backend الحالي.
+
+**Decision:** إزالة هذا الملف بعد التأكد من عدم وجود Imports أو Dependencies تعتمد عليه.
+
+لا ينبغي الخلط بينه وبين:
+
+```
+backend/app/schemas/weather_summary.py
+```
+
+فالملف الثاني له غرض مختلف: تعريف Response الخاص بالـ Route Weather Summary API.
+
+> هذا التقرير يوثق القرار المعماري. لا يعني ذلك أن الملف تم حذفه بالفعل أو أن Weather API تم تنفيذها.
+
+# **11. Frontend Integration**
+
+## **11.1 User Workflow**
+
+المستخدم يحدد Route داخل واجهة MarsWalk Intelligence، ثم يستطيع طلب تحليل الطقس لهذا المسار.
+
+التسلسل المقترح:
+
+1. المستخدم يختار Route.
+2. الواجهة تحتفظ بالـ Route ID أو المرجع اللازم للمسار.
+3. المستخدم يضغط Analyze Weather.
+4. Frontend يرسل `POST /api/v1/weather/analyze`.
+5. Backend ينفذ التحليل ويعيد `WeatherSummaryResponse`.
+6. Frontend يعرض النتيجة.
+7. عند العودة إلى نفس المسار أو فتح ملخص محفوظ، يمكن استخدام `GET /api/v1/weather/summary` لاسترجاع النتيجة دون إعادة التحليل.
+
+## **11.2 Proposed UI Components**
+
+يتم تحديد الشكل النهائي بعد تثبيت Response Schema، لكن يمكن أن تشمل الواجهة:
+
+- **Route Context:** تعريف المسار الذي يخصه التحليل.
+- **Weather Overview:** ملخص عام للظروف الجوية على المسار.
+- **Measurement Cards:** عرض القياسات المهمة مع وحداتها.
+- **Min / Max / Average:** عند حسابها وتوفرها في البيانات.
+- **Data Coverage:** توضيح مدى توفر البيانات المستخدمة.
+- **Quality Indicators:** توضيح أي قيود أو تحذيرات مرتبطة بالبيانات.
+- **Analysis Timestamp:** وقت إنشاء الملخص.
+
+لا يجب عرض قيمة غير متاحة على أنها صفر، ولا عرض قيمة تقديرية على أنها قياس فعلي.
+
+## **11.3 Route Switching Behavior**
+
+يجب ربط كل Summary بالـ Route الذي تم تحليله.
+
+عند اختيار Route مختلف:
+
+- لا يتم عرض Summary الخاص بالمسار السابق باعتباره نتيجة للمسار الجديد.
+- يتم جلب Summary المرتبط بالمسار الجديد أو تشغيل تحليل جديد عند طلب المستخدم.
+- يجب أن تتعامل الواجهة مع حالات Loading وError وNo Data بصورة واضحة.
+
+# **PART 4 — DATA CONTRACTS & PACKAGE STRUCTURE**
+
+# **12. Data vs Schema vs Validator vs API**
+
+| Element           | Responsibility                                        |
+| ----------------- | ----------------------------------------------------- |
+| Dataset           | البيانات الفعلية التي تحتوي على Records وMeasurements |
+| Schema / Contract | وصف شكل البيانات والحقول والأنواع والعلاقات           |
+| Validator         | فحص مدى مطابقة Dataset للـ Schema                     |
+| API               | واجهة تسمح لمستهلك آخر بطلب البيانات أو تنفيذ عملية   |
+
+وجود Schema لا يعني نقل البيانات، ووجود Validator لا يعني أنه ينفذ Filtering.
+
+## **12.1 Required Contracts**
+
+| Stage                | Contract                 | Validator                        | Purpose                     |
+| -------------------- | ------------------------ | -------------------------------- | --------------------------- |
+| Normalization Output | `normalized_schema.json` | `normalized_schema_validator.py` | وصف وفحص مدخل Filtering     |
+| Filtering Output     | `filtered_schema.py`     | `filtered_schema_validator.py`   | وصف وفحص مدخل Aggregation   |
+| Aggregation Output   | يحدد بعد تصميم Outputs   | حسب الحاجة                       | توحيد مخرجات المستهلكين     |
+| Backend Response     | `weather_summary.py`     | Pydantic validation              | عقد Weather API مع Frontend |
+
+الـ Schemas الخاصة بالـ API من المناسب أن تكون Python/Pydantic بما يتوافق مع أسلوب Backend الحالي.
+
+أما عقود البيانات المحلية في Pipeline، فيمكن استخدام صيغة مناسبة لطبيعة كل Package، مع الحفاظ على وضوح العقد واستقلاله عن منطق المعالجة.
+
+# **13. Proposed Filtering Package Structure**
+
+```
+MEDA_FILTERING/
+│
+├── meda_filtering/
+│   ├── __init__.py
+│   ├── cli.py
+│   ├── filter.py
+│   ├── rules.py
+│   ├── report.py
+│   │
+│   └── schemas/
+│       ├── __init__.py
+│       ├── normalized_schema.json
+│       ├── normalized_schema_validator.py
+│       ├── filtered_schema.py
+│       └── filtered_schema_validator.py
+│
+├── tests/
+├── README.md
+└── requirements.txt
+```
+
+هذا هيكل مقترح للحزمة، ويمكن تعديله بما يتوافق مع النسخة النهائية للكود، دون خلط Schema مع منطق Filtering.
+
+### **File Responsibilities**
+
+- `cli.py`: نقطة تشغيل الحزمة وإعداد المدخلات والمخرجات.
+- `filter.py`: تنسيق وتنفيذ عملية الفلترة.
+- `rules.py`: قواعد الفلترة وإعداداتها.
+- `report.py`: إنتاج تقرير القبول والرفض والمراجعة.
+- `normalized_schema.json`: وصف عقد مدخلات Normalizer.
+- `normalized_schema_validator.py`: فحص Normalized Dataset.
+- `filtered_schema.py`: تعريف عقد ناتج Filtering فقط.
+- `filtered_schema_validator.py`: فحص Filtered Dataset.
+
+# **14. Local Pipeline Execution**
+
+المراحل تتبادل البيانات من خلال ملفات محلية متفق على عقودها.
+
+```
+Normalizer Package
+    |
+    | writes Normalized Dataset
+    v
+Local Normalized Dataset
+    |
+    | read by Filtering
+    v
+Filtering Package
+    |
+    | writes Filtered Dataset + Report
+    v
+Local Filtered Dataset
+    |
+    | read by Aggregation
+    v
+Aggregation Package
+    |
+    | writes Aggregation Outputs
+    v
+Local Aggregation Outputs
+```
+
+لا نحتاج إلى إنشاء API بين Normalization وFiltering أو بين Filtering وAggregation لمجرد أنها Packages مستقلة.
+
+المهم هو:
+
+- تحديد مكان المدخلات والمخرجات.
+- تثبيت أسماء الملفات أو طريقة اكتشافها.
+- تثبيت الـ Schema/Contract.
+- التحقق من سلامة المدخلات والمخرجات.
+- تسجيل إصدار الحزمة والقواعد المستخدمة عند الحاجة إلى إعادة إنتاج النتائج.
+
+أما API فيُستخدم عندما نحتاج إلى توفير وظيفة أو بيانات لمستهلك خارجي، مثل Backend وFrontend.
+
+# **PART 5 — IMPLEMENTATION ROADMAP**
+
+# **15. Execution Plan**
+
+## **Phase 1 — Finalize Normalizer Output Contract**
+
+- مراجعة ناتج Normalizer v2.1 الفعلي.
+- التأكد من أن `normalized_schema.json` يعكس البنية الفعلية، وليس بنية مفترضة.
+- التأكد من أن Validator مستقل ولا يعدل البيانات.
+- توثيق طريقة تشغيل Normalizer ومكان الناتج.
+
+**Completion Criteria:** Filtering يستطيع الاعتماد على عقد ثابت ومدقق لقراءة Normalized Dataset.
+
+## **Phase 2 — Implement Filtering Package**
+
+- بناء Package مستقلة.
+- اعتماد Measurement-Level decisions.
+- إضافة حالات accepted وrejected وreview_required.
+- تفعيل القواعد التي لها أدلة فقط.
+- جعل القواعد غير المؤكدة Disabled/Pending.
+- الحفاظ على Provenance وMetadata الضرورية.
+- إنتاج `meda_filtered.jsonl`.
+- إنتاج Filtering Report.
+- تعريف `filtered_schema.py`.
+- إنشاء Validator مستقل.
+
+**Completion Criteria:** يمكن فحص كل قرار فلترة ومعرفة سببه، ويمكن التحقق من أن الناتج يطابق Filtered Contract.
+
+## **Phase 3 — Design Aggregation Before Coding**
+
+- حصر احتياجات Cost Function.
+- حصر احتياجات Consumables.
+- حصر احتياجات Route Weather Summary.
+- تحديد القياسات المطلوبة لكل Consumer.
+- تحديد Spatial وTemporal Aggregation.
+- تحديد الإحصاءات المناسبة لكل Measurement.
+- تحديد طريقة التعامل مع Missing Data وCoverage وUncertainty.
+- الاتفاق على Outputs وContracts.
+
+**Completion Criteria:** وجود مواصفات واضحة لمخرجات Aggregation، بدل البدء في كود لا نعرف بعد من سيستهلكه وكيف.
+
+## **Phase 4 — Implement Aggregation**
+
+- قراءة Filtered Dataset.
+- التحقق من العقد.
+- تنفيذ التجميع وفق المواصفات.
+- إنتاج المخرجات المتفق عليها.
+- إنتاج أو تحديث Metadata الخاصة بالتجميع.
+- التحقق من الوحدات والمفاتيح المكانية والزمنية.
+- فحص النتائج ومقارنتها بمدخلاتها.
+
+**Completion Criteria:** مخرجات Aggregation موثقة ويمكن استهلاكها دون إعادة تفسير بنية البيانات داخل كل Consumer.
+
+## **Phase 5 — Integrate Cost Function and Consumables**
+
+- توصيل كل Consumer بالمخرجات المناسبة.
+- منع تكرار منطق تجهيز البيانات العلمية داخل كل Consumer.
+- توثيق أي تحويلات خاصة بكل Consumer.
+- اختبار حالات عدم توفر البيانات.
+- التأكد من عدم الخلط بين القيم الجوية والتكلفة أو استهلاك الموارد النهائي.
+
+**Completion Criteria:** كل وحدة تستخدم مخرجات Aggregation بطريقة واضحة ومتوافقة مع مسؤوليتها.
+
+## **Phase 6 — Design Route Weather Analysis**
+
+- تحديد كيفية ربط المسار بالبيانات المكانية.
+- تحديد البيانات الجوية ذات الصلة بالمسار.
+- تحديد طريقة التعامل مع الامتداد المكاني والزمني.
+- تحديد الملخصات التي ستُحسب.
+- تحديد Coverage وQuality/Uncertainty indicators.
+- تحديد شكل `WeatherSummaryResponse`.
+
+**Completion Criteria:** مواصفات تحليل المسار وResponse Contract متفق عليها.
+
+## **Phase 7 — Implement Backend Weather API**
+
+- إنشاء `backend/app/schemas/weather_summary.py`.
+- إنشاء `backend/app/api/weather.py`.
+- تنفيذ `POST /api/v1/weather/analyze`.
+- تنفيذ `GET /api/v1/weather/summary`.
+- تسجيل Weather Router في التطبيق.
+- تحديد طريقة حفظ أو Cache النتائج.
+- ربط كل نتيجة بالـ Route الصحيح.
+- إضافة معالجة للأخطاء وحالات عدم توفر البيانات.
+
+**Completion Criteria:** يمكن طلب تحليل مسار واسترجاع ملخصه من خلال API موثق.
+
+## **Phase 8 — Frontend Integration**
+
+- إضافة واجهة اختيار/تحديد المسار ضمن سياق التحليل.
+- إضافة Analyze Weather.
+- استدعاء Analyze Endpoint.
+- عرض Loading وError وNo Data states.
+- عرض Weather Summary.
+- استرجاع الملخص المحفوظ عند الحاجة.
+- التأكد من عدم عرض Summary لمسار مختلف.
+- عرض الوحدات وCoverage والتحذيرات بوضوح.
+
+**Completion Criteria:** المستخدم يستطيع اختيار Route، وطلب تحليل الطقس، ورؤية نتيجة مرتبطة بالمسار نفسه.
+
+## **Phase 9 — End-to-End Validation**
+
+اختبار المسار الكامل:
+
+```
+MEDA Source Data
+      |
+      v
+Normalization
+      |
+      v
+Normalized Dataset Validation
+      |
+      v
+Filtering
+      |
+      v
+Filtered Dataset Validation
+      |
+      v
+Aggregation
+      |
+      v
+Aggregation Output Validation
+      |
+      v
+Route Weather Analysis
+      |
+      v
+Backend API
+      |
+      v
+Frontend Display
+```
+
+ويشمل الاختبار:
+
+- التأكد من أن كل مرحلة تقرأ العقد الصحيح.
+- التأكد من أن عدد القياسات قبل وبعد Filtering قابل للتفسير.
+- التأكد من أن أسباب الرفض والمراجعة قابلة للتتبع.
+- التأكد من عدم اختراع قيم للبيانات المفقودة.
+- التأكد من صحة الوحدات.
+- التأكد من أن Summary مرتبط بالـ Route الصحيح.
+- اختبار المسارات التي لا تتوفر لها بيانات كافية.
+- التأكد من أن تغيير Route لا يترك نتيجة المسار السابق ظاهرة على أنها نتيجة جديدة.
+
+# **16. Current Status Overview**
+
+هذا الجدول يفرق بين المعلومات المؤكدة في سياق العمل وبين الخطة المستقبلية. لا يعتبر بديلًا عن مراجعة الملفات المحلية أو GitHub لتحديث الحالة الفعلية.
+
+| Component                       | Status                            |
+| ------------------------------- | --------------------------------- |
+| Normalizer Package v2.1         | تم العمل عليه                     |
+| MEDA Canonical Normalization    | جزء أساسي من Normalization المنفذ |
+| Normalized Dataset              | مخرج Normalization                |
+| Normalized Schema + Validator   | مطلوب تثبيت/مراجعة عقدهما الفعلي  |
+| Filtering Package               | مرحلة التصميم والتنفيذ التالية    |
+| Filtering Rules                 | تحتاج أدلة وتوثيقًا قبل التفعيل   |
+| Filtered Dataset                | لم يتم تأكيد اكتماله              |
+| Filtered Schema + Validator     | ضمن تنفيذ Filtering               |
+| Aggregation Design              | لم يتم تثبيت تفاصيله النهائية     |
+| Aggregation Outputs             | لم يتم تأكيد تنفيذها              |
+| Cost Function Integration       | مستهلك لاحق لمخرجات Aggregation   |
+| Consumables Integration         | مستهلك لاحق لمخرجات Aggregation   |
+| Route Weather Analysis          | يحتاج مواصفات وتنفيذًا            |
+| Weather Summary Pydantic Schema | مقترح                             |
+| Weather API Endpoints           | مقترحة وليست مؤكدة التنفيذ        |
+| Frontend Weather Summary        | هدف الربط النهائي                 |
+
+# **17. Core Architectural Decisions**
+
+1. Normalization مسؤول عن توحيد شكل البيانات، وليس اتخاذ قرار صلاحيتها العلمية.
+2. Filtering يعمل على مستوى Measurement قدر الإمكان، ولا يحذف Record كاملًا دون ضرورة موثقة.
+3. كل قاعدة Filtering يجب أن تكون مدعومة بدليل، ويمكن تتبع سبب القرار.
+4. لا Interpolation ولا Fabricated Values ولا Silent Repair داخل Filtering.
+5. لا نفترض أن Calibrated وDerived قابلان للاستبدال.
+6. Aggregation يجهز البيانات والإحصاءات؛ لا يحسب Cost Function أو Consumables النهائيين.
+7. Aggregation Outputs يجب أن تُصمم حسب احتياجات المستهلكين، وليس افتراض ملف واحد يناسب الجميع.
+8. المراحل العلمية تتبادل ملفات محلية عبر Contracts، ولا تحتاج API داخلية لمجرد الفصل إلى Packages.
+9. Route Weather Summary يخص Route محددًا، ويمكن أن يختلف من مسار لآخر.
+10. Backend Weather API هي الواجهة التي تربط تحليل المسار بالـ Frontend.
+11. `backend/app/schemas/weather.py` المكرر ليس هو Response Schema المطلوب للواجهة، والقرار هو إزالته بعد مراجعة الاعتماديات.
+12. `backend/app/schemas/weather_summary.py` هو المكان المقترح لعقد الاستجابة الخاص بالـ Weather Summary.
+
+# **18. Final Expected Outcome**
+
+عند اكتمال الخطة، سيكون لدينا مسار واضح وقابل للتتبع:
+
+- بيانات MEDA الأصلية تُحوّل إلى Normalized Dataset موحد.
+- Filtering يحدد القياسات المقبولة والمرفوضة والتي تحتاج مراجعة، مع أسباب قابلة للتتبع.
+- Aggregation ينتج البيانات العلمية المناسبة للمستهلكين.
+- Cost Function يستخدم البيانات لحساب تكلفة الخلايا والـ Weights.
+- Consumables يستخدمها لتقدير تأثير الطقس على الموارد.
+- Route Weather Analysis ينتج ملخصًا خاصًا بالمسار المختار.
+- Backend يتيح تشغيل التحليل واسترجاع نتيجته.
+- Frontend يعرض ملخصًا واضحًا مرتبطًا بالـ Route الصحيح.
+
+**المبدأ الأساسي للمشروع:** كل مرحلة لها مسؤولية محددة، ومدخلات ومخرجات معروفة، وContract واضح. لا نكرر المعالجة في أكثر من مكان، ولا نخلط تجهيز البيانات العلمية بالحسابات الخاصة بالمستهلكين أو بطريقة عرضها في الواجهة.
+
+```
+```
